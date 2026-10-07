@@ -39,7 +39,19 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: cooked
           VERSION_CODE: ${{ github.run_number }}
-        run: gradle --no-daemon assembleRelease
+        shell: bash
+        run: |
+          set +e
+          gradle --no-daemon assembleRelease > "$RUNNER_TEMP/build.log" 2>&1
+          code=$?
+          tail -n 25 "$RUNNER_TEMP/build.log"
+          if [ $code -ne 0 ]; then
+            SUMMARY=$(grep -i -A14 'what went wrong' "$RUNNER_TEMP/build.log" | head -n 50)
+            [ -z "$SUMMARY" ] && SUMMARY=$(tail -n 50 "$RUNNER_TEMP/build.log")
+            SUMMARY=$(printf '%s' "$SUMMARY" | tr -d '\r' | sed ':a;N;$!ba;s/%/%25/g;s/\n/%0A/g')
+            echo "::error title=Gradle build failed::$SUMMARY"
+            exit $code
+          fi
 
       - name: Publish release
         env:
