@@ -2,41 +2,44 @@ plugins {
     id 'com.android.application'
 }
 
+def vcode = Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
+def ksFile = System.getenv('KEYSTORE_FILE')
+
 android {
-    namespace 'io.github.playcookedgame.cooked'
-    compileSdk 34
+    namespace = 'io.github.playcookedgame.cooked'
+    compileSdk = 34
 
     defaultConfig {
-        applicationId 'io.github.playcookedgame.cooked'
-        minSdk 24
-        targetSdk 34
-        versionCode (System.getenv('VERSION_CODE') ?: '1').toInteger()
-        versionName '1.' + (System.getenv('VERSION_CODE') ?: '0')
+        applicationId = 'io.github.playcookedgame.cooked'
+        minSdk = 24
+        targetSdk = 34
+        versionCode = vcode
+        versionName = "1.${vcode}"
     }
 
     signingConfigs {
         release {
-            if (System.getenv('KEYSTORE_FILE')) {
-                storeFile file(System.getenv('KEYSTORE_FILE'))
-                storeType 'pkcs12'
-                storePassword System.getenv('KEYSTORE_PASSWORD')
-                keyAlias System.getenv('KEY_ALIAS')
-                keyPassword System.getenv('KEYSTORE_PASSWORD')
+            if (ksFile) {
+                storeFile = file(ksFile)
+                storeType = 'pkcs12'
+                storePassword = System.getenv('KEYSTORE_PASSWORD')
+                keyAlias = System.getenv('KEY_ALIAS')
+                keyPassword = System.getenv('KEYSTORE_PASSWORD')
             }
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            if (System.getenv('KEYSTORE_FILE')) {
-                signingConfig signingConfigs.release
+            minifyEnabled = false
+            if (ksFile) {
+                signingConfig = signingConfigs.release
             }
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
