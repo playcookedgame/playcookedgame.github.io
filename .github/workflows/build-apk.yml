@@ -1,5 +1,3 @@
-# STAGED WORKFLOW. To activate, this file must live at .github/workflows/build-apk.yml
-# (needs a token with the Workflows permission). Keystore secrets are described in android/README.md.
 name: Build Android APK
 
 on:
