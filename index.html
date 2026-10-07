@@ -118,7 +118,7 @@ button:disabled{opacity:.45;cursor:default}
 #adbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)}#adbox.hide{display:none}
 #adc{width:100%;max-width:440px;max-height:100%;display:flex;flex-direction:column;gap:10px;background:#160d26;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 #adh{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}#adtm{background:rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;font-variant-numeric:tabular-nums}
-#adf{position:relative;width:100%;height:min(56vh,420px);border-radius:14px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#aaa;font-weight:700}#adf iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+#adf{position:relative;width:100%;min-height:120px;padding:18px;box-sizing:border-box;border-radius:14px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#aaa;font-weight:700}#adf iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
 #adp{height:6px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}#adpi{display:block;height:100%;width:0;background:linear-gradient(90deg,#9945FF,#14F195);transition:width .3s linear}
 #adb{display:flex;gap:10px}#adb button{flex:1;margin:0}
 #wp{position:fixed;inset:0;z-index:25;background:#0d0716;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text;color:var(--fg)}
@@ -174,7 +174,9 @@ const CFG={
  demo:true, // true = purchases and ads are simulated (preview only). Set false in production.
  reviveCost:300,
  starterCoins:5000, // new-player bonus
- rewards:{free:100,levelUp:50},
+ rewards:{free:500,levelUp:50},
+ adCooldownMs:3600000, // 1 hour between reward ads
+ adDailyMax:4, // reward ads per day, resets at local midnight
  levels:{base:5000,step:15000,power:1.6}, // total coins needed per level. Level 1 = the 5,000 starter coins
  earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
  site:'https://playcookedgame.github.io/', // your domain once you own it, for example https://cooked.app (used in share links)
@@ -649,7 +651,7 @@ $('fill').style.width=heat+'%';$('heat').textContent=Math.round(heat)+'%';$('st'
 if(iT>=17.5)endIntro()}
 
 
-let inv=Object.assign({skin:'Classic',owned:['Classic'],shield:0,ins:0,adAt:0},ld('cooked_inv',{})),mute=ld('cooked_mute',false),AC=null;
+let inv=Object.assign({skin:'Classic',owned:['Classic'],shield:0,ins:0,adAt:0,adDay:'',adN:0},ld('cooked_inv',{})),mute=ld('cooked_mute',false),AC=null;
 const sinv=()=>sv('cooked_inv',inv);
 const SK=[{n:'Classic',cost:0,a:[200,170,255],b:[150,90,255]},{n:'Gold',cost:2000,a:[255,226,140],b:[255,176,40]},{n:'Neon',cost:3500,a:[170,255,196],b:[60,230,120]}];
 function skinCol(h,k){const sk=SK.find(x=>x.n===inv.skin)||SK[0],hot=k==='a'?[255,120,80]:[255,70,50];return sk[k].map((v,i)=>Math.round(v+(hot[i]-v)*h*.8))}
@@ -663,18 +665,24 @@ function runAd(kind,cb){if(CFG.adHandler){Promise.resolve(CFG.adHandler(kind)).t
 if(!CFG.adUrl&&!CFG.demo){say('Ads are not connected yet');return}openAd(cb)}
 function openAd(cb){const o=$('adbox');if(!o.classList.contains('hide'))return;
 const T=(CFG.adSeconds||30)*1000,f=$('adf'),ok=$('adok'),tm=$('adtm'),pi=$('adpi');let el=0,last=Date.now(),iv;
-f.innerHTML='<div style="padding:18px">📺 Your ad opened in a new tab.<br><small style="font-weight:500">Stay there for the timer, then come back here and tap Continue.</small><br><button class="alt" id="adre" style="margin-top:12px">Open ad again</button></div>';if(CFG.adUrl){try{window.open(CFG.adUrl,'_blank')}catch(e){}const re=$('adre');if(re)re.onclick=()=>{try{window.open(CFG.adUrl,'_blank')}catch(e){}}}
+f.innerHTML='<div>Ads open in another tab.<br><small style="font-weight:500">Stay on the ad tab until the countdown ends, then come back and tap Continue.</small>'+(CFG.adUrl?'<br><a id="adre" href="#" style="color:#9bd;font-size:13px;font-weight:600">Ad did not open? Tap here</a>':'')+'</div>';if(CFG.adUrl){try{window.open(CFG.adUrl,'_blank')}catch(e){}const re=$('adre');if(re)re.onclick=e=>{e.preventDefault();try{window.open(CFG.adUrl,'_blank')}catch(x){}}}
 ok.disabled=true;pi.style.width='0';const cx=$('adx');cx.classList.add('hide');
 const close=()=>{clearInterval(iv);o.classList.add('hide');f.innerHTML=''};
 const paint=()=>{const left=Math.max(0,Math.ceil((T-el)/1000));tm.textContent=left+'s';pi.style.width=Math.min(100,el/T*100)+'%';if(el>=T){clearInterval(iv);cx.classList.remove('hide');ok.disabled=false;ok.textContent='Continue ▶';tm.textContent='Done ✓'}else ok.textContent='Wait '+left+'s'};
 iv=setInterval(()=>{const n=Date.now();el+=n-last;last=n;paint()},250);paint();
 $('adx').onclick=close;ok.onclick=()=>{if(el<T)return;close();cb()};o.classList.remove('hide')}
 let shopMsg=null,shopJust=null;
-function shop(back=menu){const free=Date.now()-(inv.adAt||0)>=300000,m=shopMsg,j=shopJust;shopMsg=null;shopJust=null;
+const dayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+function adRoll(){const k=dayKey();if(inv.adDay!==k){inv.adDay=k;inv.adN=0;inv.adAt=0;sinv()}}
+function adWait(){adRoll();if(inv.adN>=CFG.adDailyMax)return -1;return Math.max(0,(inv.adAt||0)+CFG.adCooldownMs-Date.now())}
+function adLabel(){const w=adWait();if(w<0)return'📺 Daily limit reached<br><small>Resets at midnight</small>';if(w>0){const t=Math.ceil(w/1000),h=Math.floor(t/3600),mm=String(Math.floor(t%3600/60)).padStart(2,'0'),ss=String(t%60).padStart(2,'0');return'📺 Next ad in '+(h?h+':':'')+(h?mm:Math.floor(t/60))+':'+ss+'<br><small>'+inv.adN+'/'+CFG.adDailyMax+' watched today</small>'}return'📺 Watch an ad: +'+fmt(CFG.rewards.free)+' <i class=cc></i><br><small>'+inv.adN+'/'+CFG.adDailyMax+' watched today</small>'}
+let adTick=null;
+function shop(back=menu){const free=adWait()===0,m=shopMsg,j=shopJust;clearInterval(adTick);shopMsg=null;shopJust=null;
 const jc=id=>j===id?' just':'';
-$('card').innerHTML=`<h2>🛒 Shop</h2><div class="chip"><i class=cc></i> ${fmt(bal)}</div>${CFG.demo?'<p class="small">Demo mode: ads are simulated.</p>':''}<div id="shn" aria-live="polite">${m?`<div class="shmsg ${m.t||''}"><b>${m.h}</b>${m.b||''}${m.s?'<small>'+m.s+'</small>':''}</div>`:''}</div><button class="alt${jc('fa')}" style="width:100%" id="fa" ${free?'':'disabled'}>${free?'📺 Watch an ad: +'+fmt(CFG.rewards.free)+' <i class=cc></i>':'📺 Free coins available soon'}</button><p class="small">Orb looks</p><div class="grid">${SK.map((k,i)=>`<button class="alt${jc('sk'+i)}" id="sk${i}">${inv.owned.includes(k.n)?(inv.skin===k.n?'✓ '+k.n+'<span class="d">Equipped</span>':k.n+'<span class="d">Owned · tap to equip</span>'):k.n+'<br><small>'+fmt(k.cost)+' <i class=cc></i></small>'}</button>`).join('')}</div><p class="small">Boosts for your next run</p><div class="grid"><button class="alt${jc('bs')}" id="bs">🛡️ Start shield<br><small>250 <i class=cc></i> · you have ${inv.shield}</small><span class="d">Blocks the first problem that hits you</span></button><button class="alt${jc('bi')}" id="bi">🧾 Insurance<br><small>400 <i class=cc></i> · you have ${inv.ins}</small><span class="d">Halves coins lost from hits for one run</span></button></div><button class="alt" style="width:100%;margin-top:10px" id="bk">Back</button>`;
+$('card').innerHTML=`<h2>🛒 Shop</h2><div class="chip"><i class=cc></i> ${fmt(bal)}</div>${CFG.demo?'<p class="small">Demo mode: ads are simulated.</p>':''}<div id="shn" aria-live="polite">${m?`<div class="shmsg ${m.t||''}"><b>${m.h}</b>${m.b||''}${m.s?'<small>'+m.s+'</small>':''}</div>`:''}</div><button class="alt${jc('fa')}" style="width:100%" id="fa" ${free?'':'disabled'}>${adLabel()}</button><p class="small">Orb looks</p><div class="grid">${SK.map((k,i)=>`<button class="alt${jc('sk'+i)}" id="sk${i}">${inv.owned.includes(k.n)?(inv.skin===k.n?'✓ '+k.n+'<span class="d">Equipped</span>':k.n+'<span class="d">Owned · tap to equip</span>'):k.n+'<br><small>'+fmt(k.cost)+' <i class=cc></i></small>'}</button>`).join('')}</div><p class="small">Boosts for your next run</p><div class="grid"><button class="alt${jc('bs')}" id="bs">🛡️ Start shield<br><small>250 <i class=cc></i> · you have ${inv.shield}</small><span class="d">Blocks the first problem that hits you</span></button><button class="alt${jc('bi')}" id="bi">🧾 Insurance<br><small>400 <i class=cc></i> · you have ${inv.ins}</small><span class="d">Halves coins lost from hits for one run</span></button></div><button class="alt" style="width:100%;margin-top:10px" id="bk">Back</button>`;
 const say_=(o,id)=>{shopMsg=o;shopJust=id||null;shop(back)},buy=(c,id,f,o)=>{if(bal<c){say_({t:'bad',h:'Not enough coins',b:'You need '+fmt(c-bal)+' more. Play a run or watch an ad to earn them.'},null);return}bal-=c;sv('cooked_bal',bal);f();sinv();say_(o(),id)};
-$('fa').onclick=()=>{if(!free)return;runAd('free',()=>{bal+=CFG.rewards.free;sv('cooked_bal',bal);inv.adAt=Date.now();sinv();say_({t:'ok',h:'+'+fmt(CFG.rewards.free)+' coins added',b:'Thanks for watching! Your balance is now '+fmt(bal)+'.'},'fa')})};
+adTick=setInterval(()=>{const b=$('fa');if(!b){clearInterval(adTick);return}const w=adWait();b.innerHTML=adLabel();b.disabled=w!==0},1000);
+$('fa').onclick=()=>{if(adWait()!==0)return;runAd('free',()=>{if(adWait()!==0)return;bal+=CFG.rewards.free;sv('cooked_bal',bal);inv.adAt=Date.now();inv.adN=(inv.adN||0)+1;sinv();say_({t:'ok',h:'+'+fmt(CFG.rewards.free)+' coins added',b:'Thanks for watching! Your balance is now '+fmt(bal)+'.'},'fa')})};
 SK.forEach((k,i)=>$('sk'+i).onclick=()=>{if(inv.owned.includes(k.n)){inv.skin=k.n;sinv();say_({t:'ok',h:k.n+' equipped',b:'Your orb will look like this in your next run.'},'sk'+i)}else buy(k.cost,'sk'+i,()=>{inv.owned.push(k.n);inv.skin=k.n},()=>({h:'✅ Purchased: '+k.n+' orb',b:'It is yours forever and already equipped. Spent '+fmt(k.cost)+' coins.',s:'Tap any look you own to switch.'}))});
 $('bs').onclick=()=>buy(250,'bs',()=>inv.shield++,()=>({h:'✅ Purchased: Start shield',b:'🛡️ Your next run begins with a shield that blocks the first problem that hits you, so no coins lost. One shield is used up per run.',s:'You now have '+inv.shield+' · Spent 250 coins'}));
 $('bi').onclick=()=>buy(400,'bi',()=>inv.ins++,()=>({h:'✅ Purchased: Insurance',b:'🧾 During your next run, every hit takes only half the usual coins off your balance. One insurance is used up per run.',s:'You now have '+inv.ins+' · Spent 400 coins'}));
