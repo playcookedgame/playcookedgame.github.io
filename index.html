@@ -107,7 +107,12 @@ h2{margin:0 0 8px;font-size:26px}
 #splash.go #sptag{animation:fadein .6s 9.5s both}
 #pause{position:fixed;right:12px;top:calc(env(safe-area-inset-top,0px) + 58px);width:40px;height:40px;min-width:0;padding:0;margin:0;border-radius:50%;z-index:6;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(12,8,28,.5);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform .15s,background .15s}#pause:active{transform:scale(.92);background:rgba(255,255,255,.18)}#pause.hide{display:none}.ib{display:inline-flex;align-items:center;justify-content:center;gap:8px}#skip.hide{display:none}#skip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:rgba(12,8,28,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 button:disabled{opacity:.45;cursor:default}
-#adov{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;text-align:center}
+#adbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)}#adbox.hide{display:none}
+#adc{width:100%;max-width:440px;max-height:100%;display:flex;flex-direction:column;gap:10px;background:#160d26;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#adh{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}#adtm{background:rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;font-variant-numeric:tabular-nums}
+#adf{position:relative;width:100%;height:min(56vh,420px);border-radius:14px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#aaa;font-weight:700}#adf iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+#adp{height:6px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}#adpi{display:block;height:100%;width:0;background:linear-gradient(90deg,#9945FF,#14F195);transition:width .3s linear}
+#adb{display:flex;gap:10px}#adb button{flex:1;margin:0}
 #wp{position:fixed;inset:0;z-index:25;background:#0d0716;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text;color:var(--fg)}
 #wph{position:sticky;top:0;z-index:2;background:rgba(13,7,22,.97);padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 0;border-bottom:1px solid rgba(255,255,255,.12)}
 #wph .row{display:flex;align-items:center;gap:10px}
@@ -154,7 +159,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="hud" class="hide"><div id="bar"><div id="fill"></div></div><div id="row"><span id="t">0.0s</span><span id="st"></span><span id="heat">0%</span></div></div>
-<div id="msg"></div><div id="cap" class="hide"><div id="ct"></div><div id="cs"></div></div><div id="lvls" class="hide"></div><div id="hand" class="hide">👆</div><button id="skip" class="alt hide">Skip <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M5 5l7 7-7 7M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="pause" class="alt hide" aria-label="Pause"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.6" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.6" fill="currentColor"/></svg></button><div id="adov" class="hide"><div>📺 Ad playing (demo)...</div></div><div id="wp" class="hide" role="dialog" aria-label="Whitepaper"><div id="wph"><div class="row"><button class="alt" id="wpb">← Back</button><b>Whitepaper</b><span style="width:70px"></span></div><div id="wpbar"><i id="wpp"></i></div><div id="wpn"></div></div><article id="wpc"></article></div><div id="splash" class="hide"><canvas id="sp3d"></canvas><div id="sph">A normal day in your life...</div><div id="spbar"><i></i></div><div id="spcards"></div><div id="stamp">COOKED</div><div id="sptag">That is a normal day. Now see how long you can survive it.</div><div id="spskip">Tap to skip</div></div>
+<div id="msg"></div><div id="cap" class="hide"><div id="ct"></div><div id="cs"></div></div><div id="lvls" class="hide"></div><div id="hand" class="hide">👆</div><button id="skip" class="alt hide">Skip <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M5 5l7 7-7 7M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="pause" class="alt hide" aria-label="Pause"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.6" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.6" fill="currentColor"/></svg></button><div id="adbox" class="hide" role="dialog" aria-label="Advertisement"><div id="adc"><div id="adh"><span id="adt">📺 Watch to continue</span><span id="adtm">30s</span></div><div id="adf"></div><div id="adp"><i id="adpi"></i></div><div id="adb"><button class="alt" id="adx">✕ Cancel</button><button class="play" id="adok" disabled>Wait 30s</button></div></div></div><div id="wp" class="hide" role="dialog" aria-label="Whitepaper"><div id="wph"><div class="row"><button class="alt" id="wpb">← Back</button><b>Whitepaper</b><span style="width:70px"></span></div><div id="wpbar"><i id="wpp"></i></div><div id="wpn"></div></div><article id="wpc"></article></div><div id="splash" class="hide"><canvas id="sp3d"></canvas><div id="sph">A normal day in your life...</div><div id="spbar"><i></i></div><div id="spcards"></div><div id="stamp">COOKED</div><div id="sptag">That is a normal day. Now see how long you can survive it.</div><div id="spskip">Tap to skip</div></div>
 <div id="ov"><div class="card" id="card"></div></div>
 <script id="cfg">
 const CFG={
@@ -166,6 +171,8 @@ const CFG={
  earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
  site:'', // your domain once you own it, for example https://cooked.app (used in share links)
  token:{name:'Cooked',symbol:'COOKED',supply:750000000,players:60,investors:30,developer:10,version:'0.1',date:'October 2026'},
+ adUrl:'', // PASTE YOUR AD LINK HERE (https://...). It loads inside the ad box in the game.
+ adSeconds:30, // how long players must watch before they can continue
  adHandler:null,  // async (kind) => true when the rewarded ad was completed. kind: 'revive' | 'double' | 'free'
  sponsors:[ // billboards show at random; add or remove sponsors here
   {kind:'billboard',name:'Solana',official:true,tag:'Official sponsor',color:'#14F195',color2:'#9945FF'},
@@ -646,7 +653,15 @@ function tone(f,d,ty,v,sl,dl){if(!AC||mute)return;const t0=AC.currentTime+(dl||0
 function sfx(k){if(k==='hit'){tone(160,.3,'sawtooth',.22,-110);tone(90,.35,'square',.12,-40)}else if(k==='cool'){tone(880,.14,'sine',.16);tone(1320,.2,'sine',.14,0,.08)}else if(k==='pw'){tone(520,.12,'triangle',.16);tone(780,.12,'triangle',.16,0,.1);tone(1040,.2,'triangle',.16,0,.2)}else if(k==='lvl'){[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.16,0,i*.09))}else if(k==='over')tone(330,.6,'sawtooth',.2,-250);else if(k==='ui')tone(600,.05,'sine',.08)}
 function toggleMute(){mute=!mute;sv('cooked_mute',mute);$('mm').textContent=mute?'🔇 Sound off':'🔊 Sound on';sfx('ui')}
 function runAd(kind,cb){if(CFG.adHandler){Promise.resolve(CFG.adHandler(kind)).then(ok=>{if(ok)cb()}).catch(()=>say('Ad failed. Try again.'));return}
-if(CFG.demo){const o=$('adov');o.classList.remove('hide');setTimeout(()=>{o.classList.add('hide');cb()},2500);return}say('Ads are not connected yet')}
+if(!CFG.adUrl&&!CFG.demo){say('Ads are not connected yet');return}openAd(cb)}
+function openAd(cb){const o=$('adbox');if(!o.classList.contains('hide'))return;
+const T=(CFG.adSeconds||30)*1000,f=$('adf'),ok=$('adok'),tm=$('adtm'),pi=$('adpi');let el=0,last=Date.now(),iv;
+f.innerHTML='';if(CFG.adUrl){const fr=document.createElement('iframe');fr.src=CFG.adUrl;fr.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-forms');fr.setAttribute('referrerpolicy','no-referrer-when-downgrade');fr.title='Advertisement';f.appendChild(fr)}else f.innerHTML='<div>📺 Ad space<br><small style="font-weight:500">Your ad link will load here</small></div>';
+ok.disabled=true;pi.style.width='0';
+const close=()=>{clearInterval(iv);o.classList.add('hide');f.innerHTML=''};
+const paint=()=>{const left=Math.max(0,Math.ceil((T-el)/1000));tm.textContent=left+'s';pi.style.width=Math.min(100,el/T*100)+'%';if(el>=T){clearInterval(iv);ok.disabled=false;ok.textContent='Continue ▶';tm.textContent='Done ✓'}else ok.textContent='Wait '+left+'s'};
+iv=setInterval(()=>{const n=Date.now();if(!document.hidden)el+=n-last;last=n;paint()},250);paint();
+$('adx').onclick=close;ok.onclick=()=>{if(el<T)return;close();cb()};o.classList.remove('hide')}
 let shopMsg=null,shopJust=null;
 function shop(back=menu){const free=Date.now()-(inv.adAt||0)>=300000,m=shopMsg,j=shopJust;shopMsg=null;shopJust=null;
 const jc=id=>j===id?' just':'';
