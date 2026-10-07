@@ -172,7 +172,7 @@ const CFG={
  earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
  site:'', // your domain once you own it, for example https://cooked.app (used in share links)
  token:{name:'Cooked',symbol:'COOKED',supply:750000000,players:60,investors:30,developer:10,version:'0.1',date:'October 2026'},
- adUrl:'', // PASTE YOUR AD LINK HERE (https://...). It loads inside the ad box in the game.
+ adUrl:'https://hai8g.com/4/11977354', // PASTE YOUR AD LINK HERE (https://...). It loads inside the ad box in the game.
  adSeconds:30, // how long players must watch before they can continue
  adHandler:null,  // async (kind) => true when the rewarded ad was completed. kind: 'revive' | 'double' | 'free'
  sponsors:[ // billboards show at random; add or remove sponsors here
@@ -658,9 +658,9 @@ if(!CFG.adUrl&&!CFG.demo){say('Ads are not connected yet');return}openAd(cb)}
 function openAd(cb){const o=$('adbox');if(!o.classList.contains('hide'))return;
 const T=(CFG.adSeconds||30)*1000,f=$('adf'),ok=$('adok'),tm=$('adtm'),pi=$('adpi');let el=0,last=Date.now(),iv;
 f.innerHTML='';if(CFG.adUrl){const fr=document.createElement('iframe');fr.src=CFG.adUrl;fr.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-forms');fr.setAttribute('referrerpolicy','no-referrer-when-downgrade');fr.title='Advertisement';f.appendChild(fr)}else f.innerHTML='<div>📺 Ad space<br><small style="font-weight:500">Your ad link will load here</small></div>';
-ok.disabled=true;pi.style.width='0';
+ok.disabled=true;pi.style.width='0';const cx=$('adx');cx.classList.add('hide');
 const close=()=>{clearInterval(iv);o.classList.add('hide');f.innerHTML=''};
-const paint=()=>{const left=Math.max(0,Math.ceil((T-el)/1000));tm.textContent=left+'s';pi.style.width=Math.min(100,el/T*100)+'%';if(el>=T){clearInterval(iv);ok.disabled=false;ok.textContent='Continue ▶';tm.textContent='Done ✓'}else ok.textContent='Wait '+left+'s'};
+const paint=()=>{const left=Math.max(0,Math.ceil((T-el)/1000));tm.textContent=left+'s';pi.style.width=Math.min(100,el/T*100)+'%';if(el>=T){clearInterval(iv);cx.classList.remove('hide');ok.disabled=false;ok.textContent='Continue ▶';tm.textContent='Done ✓'}else ok.textContent='Wait '+left+'s'};
 iv=setInterval(()=>{const n=Date.now();if(!document.hidden)el+=n-last;last=n;paint()},250);paint();
 $('adx').onclick=close;ok.onclick=()=>{if(el<T)return;close();cb()};o.classList.remove('hide')}
 let shopMsg=null,shopJust=null;
@@ -724,7 +724,7 @@ function upd(dt){
  if(keys.ArrowLeft)tx=Math.max(-1,tx-dt*2.2);if(keys.ArrowRight)tx=Math.min(1,tx+dt*2.2);
  px+=(tx-px)*Math.min(1,dt*14);
  const sp=slow>0?.5:1;slow=Math.max(0,slow-dt);
- t+=dt;peakC=Math.max(peakC,runC);const nl=lvlOf(tot+peakC);if(nl>lvl){lvl=nl;heat=Math.max(0,heat-12);runC+=lvl*CFG.rewards.levelUp;say('Level '+(lvl+1)+': '+LVL(lvl).name+'  +'+fmt(lvl*CFG.rewards.levelUp)+' <i class=cc></i>');flash=.3;buzz(30);sfx('lvl')}const D=diff();runC+=dt*CFG.earn.perSec*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1);dblT=Math.max(0,dblT-dt);fastT=Math.max(0,fastT-dt);evT-=dt;if(evT<=0&&heat<85){evT=50+Math.random()*20;lifeEvent();return}
+ t+=dt;peakC=Math.max(peakC,runC);const nl=lvlOf(tot+peakC);if(nl>lvl){lvl=nl;heat=Math.max(0,heat-12);runC+=lvl*CFG.rewards.levelUp;say('Level '+(lvl+1)+': '+LVL(lvl).name+'  +'+fmt(lvl*CFG.rewards.levelUp)+' <i class=cc></i>');flash=.3;buzz(30);sfx('lvl')}const D=diff();runC+=dt*CFG.earn.perSec*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1);dblT=Math.max(0,dblT-dt);fastT=Math.max(0,fastT-dt);
  heat+=dt*(.9+D*.5);
  scroll+=dt*sp*D*.9;
  spawnT-=dt*sp;
