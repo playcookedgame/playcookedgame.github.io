@@ -174,7 +174,16 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .how{font-size:13px}
 .cc{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.2em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe27a'/%3E%3Cstop offset='1' stop-color='%23ff9f1c'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23ff4d3a'/%3E%3Cstop offset='1' stop-color='%23ffe27a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='11.5' fill='%232b1650'/%3E%3Cpath d='M16 6.5c1 3.2 5.3 5.6 5.3 10.2a5.3 5.3 0 0 1-10.6 0c0-2.2 1-3.6 2.2-4.8.2 1.4.9 2.3 1.7 2.8-.4-3.2.2-5.8 1.4-8.2z' fill='url(%23f)'/%3E%3C/svg%3E") center/contain no-repeat}
 #st.hit{color:#ff6b5e;transition:color .05s}
-#instp{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:25;display:none;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:8px 8px 8px 14px;border-radius:99px;background:rgba(20,10,34,.94);border:1px solid rgba(255,255,255,.2);color:#f6eefc;font:600 13px/1.3 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.5)}#instp.on{display:flex}#instp button{font:inherit;border:0;border-radius:99px;padding:8px 14px;cursor:pointer;background:#ff6a3d;color:#fff;font-weight:800}#instp button.x{background:none;color:#b9a7cf;padding:8px 10px}
+#instp{position:fixed;left:12px;right:12px;margin:0 auto;max-width:430px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:25;display:flex;align-items:center;gap:12px;padding:12px;border-radius:20px;background:rgba(24,13,40,.97);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 40px rgba(0,0,0,.55);color:#f6eefc;font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;transform:translateY(140%);opacity:0;visibility:hidden;transition:transform .35s ease,opacity .35s ease,visibility 0s .35s}
+#instp.on{transform:none;opacity:1;visibility:visible;transition:transform .35s ease,opacity .35s ease}
+#instp img{width:46px;height:46px;border-radius:12px;flex:none;display:block}
+#instp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#instp .tx b{font-size:15px;line-height:1.2;font-weight:800;white-space:nowrap}
+#instp .tx span{font-size:12px;line-height:1.3;color:#b9a7cf}
+#instp button{display:inline-flex;flex-direction:row;align-items:center;justify-content:center;flex:none;width:auto;min-width:0;min-height:0;margin:0;border:0;border-radius:12px;cursor:pointer;font:800 14px/1 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+#instp #instb{padding:11px 18px;background:#ff6a3d;color:#fff}
+#instp button.x{width:32px;height:32px;padding:0;background:rgba(255,255,255,.08);color:#b9a7cf;font-size:14px;border-radius:50%}
+@media (prefers-reduced-motion:reduce){#instp,#instp.on{transition:none}}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="hud" class="hide"><div id="bar"><div id="fill"></div></div><div id="row"><span id="t">0.0s</span><span id="st"></span><span id="heat">0%</span></div></div>
@@ -918,7 +927,7 @@ $('wpb').onclick=closeWP}
 wpOpen=true;$('wp').classList.remove('hide');$('wp').scrollTop=0;
 if(id)setTimeout(()=>{const el=document.getElementById('wps-'+id);if(el)el.scrollIntoView()},40)}
 function closeWP(){wpOpen=false;$('wp').classList.add('hide')}
-</script><div id="instp" role="dialog" aria-label="Install Cooked"><span id="instt">Install Cooked on your phone</span><button id="instb">Install</button><button class="x" id="instx" aria-label="Dismiss">✕</button></div>
+</script><div id="instp" role="dialog" aria-label="Install Cooked"><img src="icon-192.png" alt="" width="46" height="46"><div class="tx"><b>Install Cooked</b><span id="instt">Play full-screen, anytime</span></div><button id="instb">Install</button><button class="x" id="instx" aria-label="Dismiss">✕</button></div>
 <script>
 (function(){
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
@@ -932,7 +941,7 @@ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=
 window.addEventListener('appinstalled',function(){p.classList.remove('on');ev=null});
 b.onclick=function(){if(!ev)return;ev.prompt();ev.userChoice.then(function(){p.classList.remove('on');ev=null})};
 var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!/crios|fxios/i.test(navigator.userAgent);
-if(ios){t.textContent='To install: tap Share, then Add to Home Screen';b.style.display='none';show()}
+if(ios){t.textContent='Tap Share, then Add to Home Screen';b.style.display='none';show()}
 })();
 </script>
 </body></html>
