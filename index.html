@@ -877,7 +877,7 @@ let cdT=0,cdN=0;
 function resume(){if(S!=='paused')return;$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=3;cdN=0}
 function cdStep(dt){cdT-=dt;const n=Math.ceil(cdT);if(n!==cdN&&n>0){cdN=n;say(String(n))}if(cdT<=0){S='play';say('Go!')}}
 $('pause').onclick=pauseGame;
-document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame()});
+
 
 let wpOpen=false,wpDoc=null;
 const wEsc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
