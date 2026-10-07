@@ -663,11 +663,11 @@ function runAd(kind,cb){if(CFG.adHandler){Promise.resolve(CFG.adHandler(kind)).t
 if(!CFG.adUrl&&!CFG.demo){say('Ads are not connected yet');return}openAd(cb)}
 function openAd(cb){const o=$('adbox');if(!o.classList.contains('hide'))return;
 const T=(CFG.adSeconds||30)*1000,f=$('adf'),ok=$('adok'),tm=$('adtm'),pi=$('adpi');let el=0,last=Date.now(),iv;
-f.innerHTML='';if(CFG.adUrl){const fr=document.createElement('iframe');fr.src=CFG.adUrl;fr.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-forms');fr.setAttribute('referrerpolicy','no-referrer-when-downgrade');fr.title='Advertisement';f.appendChild(fr)}else f.innerHTML='<div>📺 Ad space<br><small style="font-weight:500">Your ad link will load here</small></div>';
+f.innerHTML='<div style="padding:18px">📺 Your ad opened in a new tab.<br><small style="font-weight:500">Stay there for the timer, then come back here and tap Continue.</small><br><button class="alt" id="adre" style="margin-top:12px">Open ad again</button></div>';if(CFG.adUrl){try{window.open(CFG.adUrl,'_blank')}catch(e){}const re=$('adre');if(re)re.onclick=()=>{try{window.open(CFG.adUrl,'_blank')}catch(e){}}}
 ok.disabled=true;pi.style.width='0';const cx=$('adx');cx.classList.add('hide');
 const close=()=>{clearInterval(iv);o.classList.add('hide');f.innerHTML=''};
 const paint=()=>{const left=Math.max(0,Math.ceil((T-el)/1000));tm.textContent=left+'s';pi.style.width=Math.min(100,el/T*100)+'%';if(el>=T){clearInterval(iv);cx.classList.remove('hide');ok.disabled=false;ok.textContent='Continue ▶';tm.textContent='Done ✓'}else ok.textContent='Wait '+left+'s'};
-iv=setInterval(()=>{const n=Date.now();if(!document.hidden)el+=n-last;last=n;paint()},250);paint();
+iv=setInterval(()=>{const n=Date.now();el+=n-last;last=n;paint()},250);paint();
 $('adx').onclick=close;ok.onclick=()=>{if(el<T)return;close();cb()};o.classList.remove('hide')}
 let shopMsg=null,shopJust=null;
 function shop(back=menu){const free=Date.now()-(inv.adAt||0)>=300000,m=shopMsg,j=shopJust;shopMsg=null;shopJust=null;
@@ -683,16 +683,6 @@ function offerRevive(){S='revive';stat.rev=1;sfx('over');$('pause').classList.ad
 $('card').innerHTML=`<h2>😵 You're cooked!</h2><p>Stress hit 100%. Take one second chance this run.</p><button class="play" id="rv1" ${bal>=CFG.reviveCost?'':'disabled'}><i class=cc></i> Revive · ${fmt(CFG.reviveCost)}</button><button class="alt" id="rv2" style="width:100%">📺 Watch an ad to revive</button><button class="alt" id="rv3" style="width:100%">No thanks</button>`;
 const go=()=>{$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');heat=40;shield=1;S='cd';cdT=3;cdN=0;sfx('pw')};
 $('rv1').onclick=()=>{if(bal<CFG.reviveCost)return;bal-=CFG.reviveCost;sv('cooked_bal',bal);go()};$('rv2').onclick=()=>runAd('revive',go);$('rv3').onclick=()=>{$('ov').style.background='';end()}}
-const EVS=[{e:'🤝',h:'Friend needs a loan',p:'"Just till month end," they say.',a:['Lend 50 <i class=cc></i> (+shield)',()=>{runC-=50;shield=1}],b:['Refuse (+8 stress)',()=>{heat+=8}]},
-{e:'💼',h:'Overtime offer',p:'Boss: "Double pay, but it will be busy."',a:['Accept: 2x coins, faster problems (20s)',()=>{dblT=20;fastT=20}],b:['Decline',()=>{}]},
-{e:'🏖️',h:'Take a day off?',p:'You are exhausted.',a:['Rest: -30 <i class=cc></i>, -35% stress',()=>{runC-=30;heat=Math.max(0,heat-35)}],b:['Keep pushing',()=>{}]},
-{e:'📈',h:'Side hustle',p:'A friend shares a business idea.',a:['Invest 60 <i class=cc></i>: coins x1.5 this run',()=>{runC-=60;hustle=1}],b:['Not now',()=>{}]},
-{e:'🏠',h:'Rent increase',p:'Landlord: "Prices have gone up."',a:['Pay now: -50 <i class=cc></i>',()=>{runC-=50}],b:['Negotiate (+10 stress)',()=>{heat+=10}]},
-{e:'🍲',h:'Mum sent food',p:'Jollof, plantain and a long phone call.',a:['Enjoy it: -15% stress',()=>{heat=Math.max(0,heat-15)}],b:['Save it for later',()=>{}]}];
-function lifeEvent(){S='event';sfx('ui');const v=EVS[Math.random()*EVS.length|0];$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
-$('card').innerHTML=`<div class="big" style="font-size:52px">${v.e}</div><h2>${v.h}</h2><p>${v.p}</p><button class="play" id="ea">${v.a[0]}</button><button class="alt" id="eb" style="width:100%">${v.b[0]}</button>`;
-const pick=f=>{f();$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=2;cdN=0};
-$('ea').onclick=()=>pick(v.a[1]);$('eb').onclick=()=>pick(v.b[1])}
 const bbSalt=Math.random()*1e4;
 const bbR=(a,b)=>{const x=Math.sin(a*127.1+b*311.7+bbSalt)*43758.5453;return x-Math.floor(x)};
 function bbRR(g,x,y,w,h,r){g.beginPath();if(g.roundRect)g.roundRect(x,y,w,h,r);else g.rect(x,y,w,h)}
@@ -803,7 +793,7 @@ function draw(){
  g.restore();
 }
 function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
-try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'||S==='event'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
+try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
 requestAnimationFrame(n=>{last=n;loop(n)});
 
 const SP=[['⏰','5:59 AM',"Alarm didn't ring",'You wake up 4 minutes before work.'],['🔋','7:10 AM','Phone at 1%','The charger is in the other bag.'],['🚦','8:45 AM','Stuck in traffic',"Boss: 'Where are you?' You: 'Almost there.'"],['💸','12:30 PM','Debit alert',"Salary is 'processing'. Rent is not."],['💬','3:15 PM','Seen',"Perfect message. Reply: 👍. Nothing else."],['📞','9:00 PM','Mum is calling',"'Have you eaten?' You say yes. You have not."],['📚','11:58 PM','Exam tomorrow',"'I'll start now.' *watches videos*"]];
