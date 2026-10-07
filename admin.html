@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>Cooked Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f4f8;--cd:#fff;--fg:#14172b;--mut:#6b7088;--ln:#e4e6ee;--ac:#14172b;--acf:#fff;--ok:#2fb872;--bad:#e5484d;--br:#8b5cf6;--br2:#c4b5fd}
+@media(prefers-color-scheme:dark){:root{--bg:#0e0f1a;--cd:#1a1c2c;--fg:#f1f2fa;--mut:#9a9eb8;--ln:#2a2d42;--ac:#f1f2fa;--acf:#14172b;--br2:#4c3a8a}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 "Plus Jakarta Sans",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.w{max-width:760px;margin:0 auto;padding:16px 16px 48px}h1{font-size:26px;margin:10px 0 2px;letter-spacing:-.5px}.sub{color:var(--mut);font-size:13px}
+.row{display:flex;gap:10px;align-items:center}.grow{flex:1}
+.seg{display:flex;background:var(--cd);border:1px solid var(--ln);border-radius:99px;padding:4px;margin:14px 0 12px}
+.seg b{padding:8px 16px;border-radius:99px;font-weight:600;font-size:14px;color:var(--mut);cursor:pointer;white-space:nowrap}.seg b.on{background:var(--bg);color:var(--fg);box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tabs b{white-space:nowrap;padding:10px 20px;border-radius:99px;font-weight:700;color:var(--mut);cursor:pointer}.tabs b.on{background:var(--ac);color:var(--acf)}
+.ic{width:44px;height:44px;border-radius:50%;border:1px solid var(--ln);background:var(--cd);color:var(--fg);font-size:18px;cursor:pointer;display:grid;place-items:center;flex:none}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c{background:var(--cd);border-radius:26px;padding:18px;box-shadow:0 2px 14px rgba(20,23,43,.07);min-width:0}.c.f{grid-column:1/-1}
+.c small{display:block;color:var(--mut);font-size:13px;font-weight:600}.c .v{font-size:32px;font-weight:800;letter-spacing:-1px;margin:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.c .s{color:var(--mut);font-size:12.5px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:6px}.dot.b{background:var(--bad)}.dot.p{animation:pl 1.6s infinite}@keyframes pl{50%{opacity:.35}}
+.bars{display:flex;align-items:flex-end;gap:2px;height:120px;margin:14px 0 6px}.bars i{flex:1;background:linear-gradient(var(--br),var(--br2));border-radius:4px 4px 0 0;min-height:3px}.ax{display:flex;justify-content:space-between;color:var(--mut);font-size:11px}
+.hb{margin:10px 0}.hb div{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}.hb u{display:block;height:8px;border-radius:9px;background:var(--bg);overflow:hidden}.hb u i{display:block;height:100%;background:var(--br);border-radius:9px}
+input,select,button.p{font:inherit;border-radius:14px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);padding:12px 14px;width:100%}button.p{background:var(--ac);color:var(--acf);font-weight:700;border:0;cursor:pointer}button.p.o{background:none;color:var(--fg);border:1px solid var(--ln)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:10px 0 12px;scrollbar-width:none}.chips b{white-space:nowrap;font-size:13px;padding:7px 14px;border-radius:99px;border:1px solid var(--ln);background:var(--cd);color:var(--mut);cursor:pointer}.chips b.on{background:var(--br);border-color:var(--br);color:#fff}
+.pl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--ln);cursor:pointer}.pl.n{cursor:default}.pl:first-of-type{border:0}.pl b{font-size:16px}.pl span{color:var(--mut);font-size:12.5px}
+.rk{width:28px;height:28px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+#sh{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}#sh.on{display:flex}#sh>div{background:var(--cd);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:28px 28px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom))}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--ln)}.kv span{color:var(--mut)}.msg{margin:8px 0;font-size:13px;color:var(--mut)}.q{display:flex;gap:8px;margin-top:10px}.q button{flex:1;padding:9px;border-radius:12px;border:1px solid var(--ln);background:none;color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+@media(prefers-reduced-motion:no-preference){.c{animation:in .3s both}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style></head><body><div class="w" id="app"></div><div id="sh"><div id="shc"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=supabase.createClient('https://bhnofmsvkysppwvgcbbr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobm9mbXN2a3lzcHB3dmdjYmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNzkxODMsImV4cCI6MjEwNjk1NTE4M30.9KmzLO1L2ZPRHdPQigB452ep7DKPfUIruCNK8Xjy24s',{auth:{storageKey:'cooked-admin-auth'}});
+const $=i=>document.getElementById(i),D=864e5,H=3600e3;
+const E=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N=n=>{n=Math.round(n||0);return Math.abs(n)>=1e7?(n/1e6).toFixed(1)+'M':n.toLocaleString()};
+let rows=[],range=30,tab='ov',q='',sort='tot',ping=0,loaded=0,timer;
+const J=(d,k,f=0)=>{try{return d[k]==null?f:JSON.parse(d[k])}catch(e){return f}};
+const ago=t=>{const s=(Date.now()-t)/1e3;return s<60?'just now':s<3600?Math.floor(s/60)+'m ago':s<86400?Math.floor(s/3600)+'h ago':Math.floor(s/86400)+'d ago'};
+const sod=()=>{const d=new Date();d.setHours(0,0,0,0);return +d};
+const sus=r=>r.bal>r.tot*1.05+100;
+function login(m=''){$('app').innerHTML=`<h1>🔥 Cooked · Admin</h1><p class="sub">Sign in with your admin account.</p><div class="c" style="margin-top:16px;display:grid;gap:10px"><input id="em" type="email" placeholder="Email" autocomplete="username"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button class="p" id="go">Sign in</button><p class="msg" id="lm">${E(m)}</p></div>`;
+const go=async()=>{$('lm').textContent='Signing in…';const r=await sb.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});r.error?login(r.error.message):boot()};$('go').onclick=go;$('pw').onkeydown=e=>{if(e.key==='Enter')go()}}
+async function boot(){const{data:{session}}=await sb.auth.getSession();if(!session)return login();
+const a=await sb.from('admins').select('user_id').maybeSingle();
+if(!a.data){$('app').innerHTML='<h1>No access</h1><p class="sub">This account is not an admin. Add it to the admins table in Supabase, then sign in again.</p><br><button class="p o" onclick="out()">Sign out</button>';return}
+await load();clearInterval(timer);timer=setInterval(()=>{if(!document.activeElement||!/INPUT|SELECT/.test(document.activeElement.tagName))if(!$('sh').classList.contains('on'))load()},15000)}
+const out=async()=>{await sb.auth.signOut();clearInterval(timer);login()};
+async function load(){const t0=performance.now(),r=await sb.from('saves').select('user_id,data,created_at,updated_at').order('updated_at',{ascending:false}).limit(1000);ping=performance.now()-t0;
+if(r.error){$('app').innerHTML='<h1>Could not load</h1><p class="sub">'+E(r.error.message)+'</p><br><button class="p o" onclick="out()">Sign out</button>';return}
+rows=r.data.map(x=>{const d=x.data||{},inv=J(d,'cooked_inv',{});return{id:x.user_id,d,bal:J(d,'cooked_bal'),tot:J(d,'cooked_tot'),best:J(d,'cooked_best'),fails:J(d,'cooked_fails'),skin:inv.skin||'Classic',own:Math.max(0,(inv.owned||[]).length-1),sh:inv.shield||0,ins:inv.ins||0,c:+new Date(x.created_at),u:+new Date(x.updated_at)}});loaded=Date.now();draw()}
+const card=(l,v,s,f)=>`<div class="c${f?' f':''}"><small>${l}</small><div class="v">${v}</div><div class="s">${s||''}</div></div>`;
+const bars=(arr,t0,lab)=>{const mx=Math.max(1,...arr);return`<div class="bars">${arr.map(n=>`<i style="height:${n/mx*100}%" title="${n}"></i>`).join('')}</div><div class="ax"><span>${new Date(t0-(arr.length-1)*D).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span><span>Peak ${N(mx)}</span><span>Today</span></div>`};
+const hbar=(l,n,mx)=>`<div class="hb"><div><span>${l}</span><b>${N(n)}</b></div><u><i style="width:${n/Math.max(1,mx)*100}%"></i></u></div>`;
+const perDay=(f,t0)=>[...Array(range)].map((_,i)=>{const s=t0-(range-1-i)*D;return rows.filter(r=>f(r)>=s&&f(r)<s+D).length});
+function draw(){const now=Date.now(),act=m=>rows.filter(r=>now-r.u<m).length,t0=sod(),bad=rows.filter(sus);let body='';
+if(tab==='ov'){
+body=`<div class="g">${card('<span class="dot p"></span>Online now',N(act(3e5)),'saved in the last 5 min')}${card('Active today',N(rows.filter(r=>r.u>=t0).length),N(act(7*D))+' this week · '+N(act(30*D))+' in 30 days')}${card('Players',N(rows.length),'+'+N(rows.filter(r=>r.c>=t0).length)+' today · +'+N(rows.filter(r=>now-r.c<7*D).length)+' this week')}${card('Coins held',N(rows.reduce((a,r)=>a+r.bal,0)),N(rows.reduce((a,r)=>a+r.tot,0))+' earned all time')}${card('Best run',Math.max(0,...rows.map(r=>r.best)).toFixed(1)+'s','average '+(rows.length?rows.reduce((a,r)=>a+r.best,0)/rows.length:0).toFixed(1)+'s')}${card('Shop buyers',N(rows.filter(r=>r.own>0||r.sh||r.ins).length),N(rows.filter(r=>r.own>0).length)+' own a skin')}<div class="c f"><small>New players · last ${range} days</small>${bars(perDay(r=>r.c,t0),t0)}</div></div>`}
+else if(tab==='in'){
+const sk={};rows.forEach(r=>sk[r.skin]=(sk[r.skin]||0)+1);const skl=Object.entries(sk).sort((a,b)=>b[1]-a[1]).slice(0,6);
+const bk=[['0 – 99',0,100],['100 – 999',100,1e3],['1K – 9.9K',1e3,1e4],['10K – 99K',1e4,1e5],['100K+',1e5,1/0]].map(b=>[b[0],rows.filter(r=>r.bal>=b[1]&&r.bal<b[2]).length]);
+const top=[...rows].sort((a,b)=>b.best-a.best).slice(0,5),fl=rows.reduce((a,r)=>a+r.fails,0);
+body=`<div class="g">${card('Returning players',N(rows.filter(r=>r.u-r.c>D).length),'came back after day 1')}${card('Avg runs lost',rows.length?(fl/rows.length).toFixed(1):'0',N(fl)+' total')}<div class="c f"><small>Active players · last ${range} days (by last save)</small>${bars(perDay(r=>r.u,t0),t0)}</div><div class="c f"><small>Wallet sizes</small>${bk.map(b=>hbar(b[0],b[1],Math.max(...bk.map(x=>x[1])))).join('')}</div><div class="c f"><small>Popular orb looks</small>${skl.map(s=>hbar(E(s[0]),s[1],skl[0][1])).join('')||'<span class="sub">No data yet.</span>'}</div><div class="c f"><small>Top 5 best runs</small>${top.map((r,i)=>`<div class="pl" data-i="${r.id}"><div class="row"><div class="rk">${i+1}</div><b>${r.id.slice(0,8)}</b></div><b>${r.best.toFixed(1)}s</b></div>`).join('')||'<span class="sub">No data yet.</span>'}</div></div>`}
+else if(tab==='pl'){const so={tot:(a,b)=>b.tot-a.tot,bal:(a,b)=>b.bal-a.bal,best:(a,b)=>b.best-a.best,u:(a,b)=>b.u-a.u,c:(a,b)=>b.c-a.c};
+const l=rows.filter(r=>r.id.includes(q.toLowerCase())).sort(so[sort]).slice(0,50);
+body=`<input id="q" placeholder="Search player ID" value="${E(q)}"><div class="chips">${[['tot','Top earners'],['bal','Richest now'],['best','Best run'],['u','Recently active'],['c','Newest']].map(s=>`<b data-s="${s[0]}" class="${s[0]===sort?'on':''}">${s[1]}</b>`).join('')}</div><div class="c">${l.map(r=>`<div class="pl" data-i="${r.id}"><div><b>${r.id.slice(0,8)}</b><br><span>${ago(r.u)}${sus(r)?' · ⚠ check':''}</span></div><div style="text-align:right"><b>${N(r.bal)}</b><br><span>best ${r.best.toFixed(1)}s</span></div></div>`).join('')||'<span class="sub">No players found.</span>'}</div>`}
+else body=`<div class="g">${card('<span class="dot'+(ping>2500?' b':'')+'"></span>Database',Math.round(ping)+' ms','response time')}${card('Saves loaded',N(rows.length),rows.length>=1000?'limit reached (1,000)':'of 1,000 max')}${card('Latest save',rows[0]?ago(rows[0].u):'—','from any player')}${card('<span class="dot'+(bad.length?' b':'')+'"></span>Suspicious',N(bad.length),'balance above lifetime coins')}</div>${bad.length?`<div class="c" style="margin-top:12px"><small>Review these players</small>${bad.slice(0,10).map(r=>`<div class="pl" data-i="${r.id}"><b>${r.id.slice(0,8)}</b><span>${N(r.bal)} held · ${N(r.tot)} earned</span></div>`).join('')}</div>`:''}`;
+$('app').innerHTML=`<div class="row"><div style="font-size:28px">🔥</div><div class="grow"></div><button class="ic" onclick="out()" title="Sign out">⎋</button></div><h1>Cooked · Admin</h1><div class="sub">Live · updated ${ago(loaded)} · refreshes every 15s</div>
+<div class="row"><div class="seg grow">${[7,30,90].map(n=>`<b data-r="${n}" class="${n===range?'on':''}">${n} days</b>`).join('')}</div><button class="ic" id="rf" title="Refresh" style="margin-top:2px">↻</button></div>
+<div class="tabs">${[['ov','Overview'],['in','Insights'],['pl','Players'],['hl','Health']].map(t=>`<b data-t="${t[0]}" class="${t[0]===tab?'on':''}">${t[1]}</b>`).join('')}</div>${body}`;
+document.querySelectorAll('[data-r]').forEach(e=>e.onclick=()=>{range=+e.dataset.r;draw()});document.querySelectorAll('[data-t]').forEach(e=>e.onclick=()=>{tab=e.dataset.t;draw()});document.querySelectorAll('[data-s]').forEach(e=>e.onclick=()=>{sort=e.dataset.s;draw()});
+$('rf').onclick=load;document.querySelectorAll('.pl[data-i]').forEach(e=>e.onclick=()=>open(e.dataset.i));
+const qi=$('q');if(qi)qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;draw();const n=$('q');n.focus();n.setSelectionRange(p,p)}}
+function open(id){const r=rows.find(x=>x.id===id);if(!r)return;$('sh').classList.add('on');
+$('shc').innerHTML=`<h1 style="font-size:20px">Player ${id.slice(0,8)}</h1>${[['Balance',N(r.bal)],['Lifetime coins',N(r.tot)],['Best run',r.best.toFixed(1)+'s'],['Runs lost',N(r.fails)],['Orb look',E(r.skin)],['Shields / insurance',r.sh+' / '+r.ins],['Joined',new Date(r.c).toLocaleDateString()],['Last saved',ago(r.u)]].map(k=>`<div class="kv"><span>${k[0]}</span><b>${k[1]}</b></div>`).join('')}<div class="row" style="margin-top:14px"><input id="am" type="number" placeholder="Coins (use − to remove)"><button class="p" id="ad" style="width:auto">Apply</button></div><div class="q">${[100,1000,-100].map(n=>`<button data-n="${n}">${n>0?'+':''}${n}</button>`).join('')}</div><p class="msg" id="mm">Changes reach the player the next time they open the game.</p><button class="p o" id="cl">Close</button>`;
+$('cl').onclick=()=>$('sh').classList.remove('on');document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{$('am').value=b.dataset.n});
+$('ad').onclick=async()=>{const a=Math.round(+$('am').value);if(!a)return;const d=Object.assign({},r.d);d.cooked_bal=String(Math.max(0,r.bal+a));d._ts=Date.now();$('mm').textContent='Saving…';
+const u=await sb.from('saves').update({data:d}).eq('user_id',id).select('user_id');
+if(u.error||!u.data.length){$('mm').textContent='Failed: '+(u.error?u.error.message:'no permission. Check the admin SQL was run.');return}
+$('mm').textContent='Done. New balance '+N(Math.max(0,r.bal+a))+'.';await load();open(id)}}
+$('sh').onclick=e=>{if(e.target.id==='sh')$('sh').classList.remove('on')};
+boot();
+</script></body></html>

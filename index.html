@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<script>
+/* Cloud save (Supabase). Paste your Project URL and publishable/anon key below. */
+(function(){
+var SB_URL='https://bhnofmsvkysppwvgcbbr.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobm9mbXN2a3lzcHB3dmdjYmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNzkxODMsImV4cCI6MjEwNjk1NTE4M30.9KmzLO1L2ZPRHdPQigB452ep7DKPfUIruCNK8Xjy24s';
+if(SB_URL.indexOf('PASTE')===0)return;
+var P='cooked_',TS='cooked_syncat',sb,uid,timer,ready=false,raw=Storage.prototype.setItem;
+function mine(k){return String(k).indexOf(P)===0&&k!=='cooked_t'&&k!==TS}
+function snap(){var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(mine(k))o[k]=localStorage.getItem(k)}return o}
+Storage.prototype.setItem=function(k,v){raw.call(this,k,v);if(ready&&this===localStorage&&mine(k)){clearTimeout(timer);timer=setTimeout(push,1500)}};
+async function push(){if(!sb||!uid)return;try{var d=snap(),ts=Date.now();d._ts=ts;var r=await sb.from('saves').upsert({user_id:uid,data:d,updated_at:new Date().toISOString()});if(!r.error)raw.call(localStorage,TS,String(ts))}catch(e){}}
+async function init(){try{
+sb=window.supabase.createClient(SB_URL,SB_KEY);
+var a=await sb.auth.getSession(),u=a.data.session&&a.data.session.user;
+if(!u){var r=await sb.auth.signInAnonymously();if(r.error)return;u=r.data.user}
+uid=u.id;
+var c=await sb.from('saves').select('data').eq('user_id',uid).maybeSingle();
+var cd=c.data&&c.data.data,local=+localStorage.getItem(TS)||0;
+if(cd&&cd._ts>local){for(var k in cd)if(mine(k))raw.call(localStorage,k,cd[k]);raw.call(localStorage,TS,String(cd._ts));ready=true;location.reload();return}
+ready=true;await push();
+document.addEventListener('visibilitychange',function(){if(document.hidden){clearTimeout(timer);push()}});
+}catch(e){}}
+var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=init;document.head.appendChild(s);
+})();
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cooked</title>
+<style>
+:root{--bg:#0d0716;--fg:#f6eefc;--mut:#b9a7cf;--acc:#ff6a3d;--card:rgba(20,10,34,.78);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0716;--fg:#f6eefc}}
+:root[data-theme="dark"]{--bg:#0d0716;--fg:#f6eefc}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);padding:12px 16px;pointer-events:none}
+#bar{height:14px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden}
+#fill{height:100%;width:0;background:linear-gradient(90deg,#8a5cff,#ff9f43,#ff3d2e);transition:width .12s}
+#row{display:flex;justify-content:space-between;margin-top:6px;font-weight:700;font-size:15px}
+#msg{position:fixed;left:0;right:0;top:30%;text-align:center;font-size:28px;font-weight:800;pointer-events:none;opacity:0;transition:opacity .25s;text-shadow:0 2px 14px #000}
+#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:var(--card);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:26px 24px;max-width:340px;width:100%;text-align:center}
+h1{margin:0 0 6px;font-size:44px;letter-spacing:-1px}
+p{margin:6px 0;color:var(--mut);line-height:1.4}
+.big{font-size:56px;font-weight:900;color:var(--fg);margin:2px 0}
+.verdict{font-size:22px;font-weight:800;color:var(--acc)}
+.leg{display:grid;grid-template-columns:78px 1fr;align-items:center;text-align:left;gap:2px 10px;margin:10px 0;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14)}
+.leg b{grid-row:span 2;font-size:16px}
+.leg span{font-size:22px;letter-spacing:2px}
+.leg small{color:var(--mut);font-size:13px}
+.leg.bad{border-color:rgba(255,90,70,.55);background:rgba(255,60,40,.1)}.leg.bad b{color:#ff8f7f}
+.leg.good{border-color:rgba(120,220,255,.55);background:rgba(90,200,255,.1)}.leg.good b{color:#8fe9ff}
+.leg.pw{border-color:rgba(255,226,122,.5);background:rgba(255,226,122,.08)}.leg.pw b{color:#ffe27a}
+.how{font-size:13px}
+.card{max-height:100%;overflow-y:auto}
+input{width:100%;padding:12px;margin:4px 0;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:var(--fg);font:inherit;user-select:text;-webkit-user-select:text;touch-action:auto}
+.idbox{font-family:monospace;font-size:15px;word-break:break-all;padding:10px;border-radius:12px;background:rgba(255,255,255,.1);margin:6px 0}
+.coin{font-size:30px;font-weight:900;color:#ffd75e;margin:6px 0}
+#out p,#res{font-size:13px}#res{margin-top:6px;color:var(--mut)}
+.chip{display:inline-block;font-weight:800;font-size:20px;color:#ffd75e;background:rgba(255,215,94,.12);border:1px solid rgba(255,215,94,.4);padding:6px 16px;border-radius:99px;margin:8px 0}
+.ah{font-size:16px;margin:14px 0 4px;text-align:left}.al{text-align:left;margin:4px 0 8px;padding-left:20px;font-size:13px;color:var(--mut);line-height:1.45}.al li{margin:5px 0;padding-left:2px}.ck{list-style:none;padding-left:4px}.ck li::before{content:'✅ '}
+.ostats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.ostats div{background:rgba(255,255,255,.07);border-radius:12px;padding:8px 4px}.ostats b{display:block;font-size:16px;color:var(--fg)}.ostats span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}.odone{margin:6px 0}.odone div{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;padding:6px 10px;margin:4px 0;border-radius:10px;background:rgba(120,255,160,.08);text-align:left}.odone b{white-space:nowrap;color:#8fffa8}.onext{margin:10px 0 4px}.obar{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:6px 0}.obar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9f43,#ffd75e)}.grid button:last-child:nth-child(odd){grid-column:1/-1}
+.shmsg{margin:10px 0 4px;padding:12px 14px;border-radius:14px;text-align:left;font-size:14px;line-height:1.35;color:var(--fg);background:rgba(255,215,94,.12);border:1px solid rgba(255,215,94,.55);animation:capin .35s both}.shmsg b{display:block;font-size:16px;color:#ffd75e;margin-bottom:3px}.shmsg.bad{background:rgba(255,77,58,.14);border-color:rgba(255,77,58,.6)}.shmsg.bad b{color:#ff8a7a}.shmsg.ok{background:rgba(110,255,170,.12);border-color:rgba(110,255,170,.55)}.shmsg.ok b{color:#8dffbf}.shmsg small{display:block;margin-top:4px;color:var(--mut);font-size:12px}button.just{box-shadow:0 0 0 2px #ffd75e,0 0 18px rgba(255,215,94,.55);animation:pop .4s both}.grid button .d{display:block;font-size:11px;font-weight:500;color:var(--mut);margin-top:4px;line-height:1.25}
+.tag{font-size:16px;margin:0}.small{font-size:12px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.grid button{margin:0;min-width:0;padding:14px 8px}
+button.play{width:100%;font-size:22px;padding:16px;margin:10px 0 0}
+h2{margin:0 0 8px;font-size:26px}
+#clog{height:200px;overflow-y:auto;text-align:left;padding:8px;margin:6px 0;border-radius:12px;background:rgba(255,255,255,.07);font-size:14px}
+.msg{margin:4px 0;word-break:break-word}.msg b{color:#8fe9ff}.msg.me b{color:#ffd75e}
+.row2{display:flex;gap:8px}.row2 button{flex:1;margin:6px 0;min-width:0}
+.ch{display:flex;justify-content:space-between;gap:10px;text-align:left;padding:10px 12px;margin:8px 0;border-radius:14px;border:1px solid rgba(255,255,255,.16)}
+.ch.ok{border-color:rgba(120,255,160,.6);background:rgba(90,255,140,.08)}.ch small{color:var(--mut)}
+#cap{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 72px);text-align:center;padding:0 20px;pointer-events:none}
+#cap.in{animation:capin .6s ease both}
+#ct{font-size:26px;font-weight:900;text-shadow:0 2px 16px #000}
+#cs{font-size:15px;color:#d8c8ee;margin-top:4px;text-shadow:0 2px 10px #000}
+#cap.big #ct{font-size:68px;letter-spacing:-2px;background:linear-gradient(90deg,#b58cff,#ff9f43);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(255,120,60,.5))}
+@keyframes capin{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+#lvls{position:fixed;left:0;right:0;top:36%;display:flex;justify-content:center;gap:8px;padding:0 10px;pointer-events:none;flex-wrap:wrap}
+#lvls div{width:64px;text-align:center;animation:pop .5s both;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:8px 2px}
+#lvls span{font-size:28px;display:block}#lvls small{font-size:10px;color:#d8c8ee}
+@keyframes pop{from{opacity:0;transform:scale(.4) translateY(20px)}to{opacity:1;transform:none}}
+#hand{position:fixed;bottom:11%;left:calc(50% - 22px);font-size:44px;pointer-events:none;animation:sway 1.6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-90px)}50%{transform:translateX(90px)}}
+@media (prefers-reduced-motion:reduce){#hand{animation:none}}
+#skip{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);min-width:0;padding:10px 16px;font-size:14px;margin:0}
+#splash{position:fixed;inset:0;z-index:20;background:radial-gradient(ellipse at 50% 35%,rgba(62,22,92,.93),rgba(8,3,16,.98));display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 20px;text-align:center}
+#sph{font-size:15px;color:#cdbbe6;letter-spacing:.5px}
+#spbar{width:min(320px,80%);height:12px;border-radius:9px;background:rgba(255,255,255,.14);margin:10px 0;overflow:hidden}
+#spbar i{display:block;height:100%;width:6%;background:linear-gradient(90deg,#8a5cff,#ff9f43,#ff3d2e);}
+@keyframes spfill{to{width:100%}}
+#spcards{position:relative;flex:1;width:100%;max-width:380px}
+.spc{position:absolute;left:0;right:0;top:46%;padding:22px 18px;border-radius:22px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);opacity:0}
+.spc .e{font-size:64px;line-height:1.1}.spc .tm{font-family:monospace;color:#ffd75e;font-size:15px;margin:4px 0}.spc h3{margin:0;font-size:26px}.spc p{margin:8px 0 0;color:#e2d4f5;font-size:16px;line-height:1.4}
+@keyframes spcard{0%{opacity:0;transform:translateY(-35%) scale(.9) rotate(-2deg)}12%{opacity:1;transform:translateY(-50%) scale(1.04)}20%{opacity:1;transform:translateY(-50%) scale(1)}86%{opacity:1;transform:translateY(-50%)}100%{opacity:0;transform:translateY(-64%) scale(.97)}}
+#stamp{position:absolute;left:0;right:0;top:34%;font-size:76px;font-weight:900;letter-spacing:-2px;color:#ff5a3d;opacity:0;text-shadow:0 6px 30px rgba(255,80,40,.6)}
+@keyframes slam{0%{opacity:0;transform:scale(3) rotate(-14deg)}100%{opacity:1;transform:scale(1) rotate(-6deg)}}
+#sptag{position:absolute;left:0;right:0;top:calc(34% + 110px);padding:0 30px;font-size:18px;line-height:1.4;opacity:0}
+@keyframes fadein{to{opacity:1}}
+#spskip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);font-size:13px;color:#cdbbe6}
+#sp3d{position:absolute;inset:0;width:100%;height:100%;z-index:-1;display:none}
+#splash.d3 #sp3d{display:block}#splash.d3 #spcards{display:none}
+#splash.go #spbar i{animation:spfill 8.05s .6s linear forwards}
+#splash.fb.go .spc{animation:spcard 1.15s ease both;animation-delay:calc(var(--i)*1.15s + .6s)}
+#splash.go #stamp{animation:slam .5s 8.8s cubic-bezier(.2,1.6,.4,1) both}
+#splash.go #sptag{animation:fadein .6s 9.5s both}
+#pause{position:fixed;right:12px;top:calc(env(safe-area-inset-top,0px) + 58px);width:40px;height:40px;min-width:0;padding:0;margin:0;border-radius:50%;z-index:6;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(12,8,28,.5);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform .15s,background .15s}#pause:active{transform:scale(.92);background:rgba(255,255,255,.18)}#pause.hide{display:none}.ib{display:inline-flex;align-items:center;justify-content:center;gap:8px}#skip.hide{display:none}#skip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:rgba(12,8,28,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+button:disabled{opacity:.45;cursor:default}
+#adov{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;text-align:center}
+#wp{position:fixed;inset:0;z-index:25;background:#0d0716;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text;color:var(--fg)}
+#wph{position:sticky;top:0;z-index:2;background:rgba(13,7,22,.97);padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+#wph .row{display:flex;align-items:center;gap:10px}
+#wph button{min-width:0;margin:0;padding:8px 14px}
+#wph b{flex:1;text-align:center;font-size:16px}
+#wpbar{height:3px;background:rgba(255,255,255,.1);margin:8px -12px 0}
+#wpp{display:block;height:100%;width:0;background:linear-gradient(90deg,#8a5cff,#ff9f43)}
+#wpn{display:flex;gap:6px;overflow-x:auto;padding:8px 0}
+#wpn button{flex:none;min-width:0;margin:0;padding:6px 12px;font-size:13px;border-radius:99px}
+#wpc{max-width:720px;margin:0 auto;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 60px);line-height:1.65;font-size:16px}
+#wpc .cover{text-align:center;padding:18px 0 4px}#wpc .cover h1{font-size:38px;margin:0}#wpc .cover p{color:#b9a7cf}
+#wpc section{margin:34px 0;scroll-margin-top:120px}
+#wpc h2{font-size:26px;margin:0 0 10px}#wpc h3{font-size:18px;margin:22px 0 6px;color:#ffd75e}
+#wpc p{color:#e8dcff;margin:10px 0;text-align:left}
+#wpc ul{padding-left:20px;margin:10px 0;color:#e8dcff}#wpc li{margin:6px 0}
+.wt{overflow-x:auto;margin:12px 0;border:1px solid rgba(255,255,255,.14);border-radius:12px}
+.wt table{border-collapse:collapse;width:100%;min-width:480px;font-size:14px}
+.wt th,.wt td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.1)}
+.wt th{background:rgba(255,255,255,.08);color:#ffd75e}.wt tr.tot td{font-weight:800;background:rgba(255,255,255,.05)}
+.wn{border-radius:12px;padding:12px 14px;margin:14px 0;font-size:15px;border:1px solid}
+.wn.warn{background:rgba(255,160,60,.1);border-color:rgba(255,160,60,.5);color:#ffe2bd}
+.wn.info{background:rgba(120,200,255,.08);border-color:rgba(120,200,255,.4);color:#d8f0ff}
+.wkv{margin:12px 0;border:1px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden}
+.wkv div{display:flex;gap:12px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.1)}.wkv div:last-child{border:0}
+.wkv dt{flex:0 0 36%;color:#b9a7cf;font-size:14px}.wkv dd{margin:0;flex:1;font-size:15px}
+.wch{margin:14px 0;text-align:center}
+.wleg{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:14px;margin-top:6px}
+.wleg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.wbars{display:flex;gap:10px;align-items:flex-end;justify-content:center;height:160px}
+.wbars div{flex:1;max-width:70px;text-align:center;font-size:12px}.wbars b{display:block;border-radius:6px 6px 0 0;background:linear-gradient(#ff9f43,#8a5cff)}
+button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:14px 20px;margin:8px 4px 0;cursor:pointer;color:#fff;background:var(--acc);min-width:130px}
+button.alt{background:rgba(255,255,255,.14)}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.hide{display:none!important}
+.card{max-height:94vh;overflow:auto}
+.lg{border-radius:14px;padding:10px 12px;margin:8px 0;text-align:left;display:grid;gap:2px}
+.lg b{font-size:15px}.lg span{font-size:24px;letter-spacing:2px}.lg small{color:var(--mut);font-size:13px}
+.lg.bad{background:rgba(255,61,46,.16);border:1px solid rgba(255,61,46,.5)}.lg.bad b{color:#ff8a7d}
+.lg.good{background:rgba(127,227,255,.14);border:1px solid rgba(127,227,255,.5)}.lg.good b{color:#9be9ff}
+.lg.pw{background:rgba(255,226,122,.12);border:1px solid rgba(255,226,122,.45)}.lg.pw b{color:#ffe27a}
+.how{font-size:13px}
+.cc{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.2em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe27a'/%3E%3Cstop offset='1' stop-color='%23ff9f1c'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23ff4d3a'/%3E%3Cstop offset='1' stop-color='%23ffe27a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='11.5' fill='%232b1650'/%3E%3Cpath d='M16 6.5c1 3.2 5.3 5.6 5.3 10.2a5.3 5.3 0 0 1-10.6 0c0-2.2 1-3.6 2.2-4.8.2 1.4.9 2.3 1.7 2.8-.4-3.2.2-5.8 1.4-8.2z' fill='url(%23f)'/%3E%3C/svg%3E") center/contain no-repeat}
+#st.hit{color:#ff6b5e;transition:color .05s}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="hud" class="hide"><div id="bar"><div id="fill"></div></div><div id="row"><span id="t">0.0s</span><span id="st"></span><span id="heat">0%</span></div></div>
+<div id="msg"></div><div id="cap" class="hide"><div id="ct"></div><div id="cs"></div></div><div id="lvls" class="hide"></div><div id="hand" class="hide">👆</div><button id="skip" class="alt hide">Skip <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M5 5l7 7-7 7M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="pause" class="alt hide" aria-label="Pause"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.6" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.6" fill="currentColor"/></svg></button><div id="adov" class="hide"><div>📺 Ad playing (demo)...</div></div><div id="wp" class="hide" role="dialog" aria-label="Whitepaper"><div id="wph"><div class="row"><button class="alt" id="wpb">← Back</button><b>Whitepaper</b><span style="width:70px"></span></div><div id="wpbar"><i id="wpp"></i></div><div id="wpn"></div></div><article id="wpc"></article></div><div id="splash" class="hide"><canvas id="sp3d"></canvas><div id="sph">A normal day in your life...</div><div id="spbar"><i></i></div><div id="spcards"></div><div id="stamp">COOKED</div><div id="sptag">That is a normal day. Now see how long you can survive it.</div><div id="spskip">Tap to skip</div></div>
+<div id="ov"><div class="card" id="card"></div></div>
+<script id="cfg">
+const CFG={
+ demo:true, // true = purchases and ads are simulated (preview only). Set false in production.
+ reviveCost:300,
+ starterCoins:5000, // new-player bonus
+ rewards:{free:100,levelUp:50},
+ levels:{base:5000,step:15000,power:1.6}, // total coins needed per level. Level 1 = the 5,000 starter coins
+ earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
+ site:'', // your domain once you own it, for example https://cooked.app (used in share links)
+ token:{name:'Cooked',symbol:'COOKED',supply:750000000,players:60,investors:30,developer:10,version:'0.1',date:'October 2026'},
+ adHandler:null,  // async (kind) => true when the rewarded ad was completed. kind: 'revive' | 'double' | 'free'
+ sponsors:[ // billboards show at random; add or remove sponsors here
+  {kind:'billboard',name:'Solana',official:true,tag:'Official sponsor',color:'#14F195',color2:'#9945FF'},
+  {kind:'billboard',name:'Bitget',tag:'Partner of Cooked',color:'#00E5FF',color2:'#2A7BFF'},
+  {kind:'billboard',name:'KuCoin',tag:'Partner of Cooked',color:'#2EE6B0',color2:'#0E9A78'},
+  {kind:'cool',name:'Your Drink',emoji:'🥤',cool:20,tag:'Stay chill',demo:true}
+ ]
+};
+</script>
+<script id="wpdata">
+// Cooked whitepaper content. Pure data, no DOM, so the game and a Markdown export share it.
+// All token numbers are computed from CFG.token, so they can never disagree with each other.
+function buildWhitepaper(CFG) {
+  var TK = CFG.token;
+  var n = function (x) {
+    return Math.round(x).toLocaleString('en-US');
+  };
+  var m = function (x) {
+    return (x / 1e6).toLocaleString('en-US', { maximumFractionDigits: 2 }) + 'M';
+  };
+
+  // ---- token model ---------------------------------------------------------------------
+  var S = TK.supply;
+  var dev = (S * TK.developer) / 100;
+  var inv = (S * TK.investors) / 100;
+  var com = (S * TK.players) / 100;
+  var liq = S * 0.08; // launch liquidity (part of the players and community share)
+  var camp = S * 0.04; // community campaigns and airdrops
+  var rew = com - liq - camp; // play-to-earn rewards, emitted over five years
+  var W = [100, 90, 70, 55, 45];
+  var WS = W.reduce(function (a, b) {
+    return a + b;
+  }, 0);
+  var emit = W.map(function (w) {
+    return (rew * w) / WS;
+  });
+  var clamp = function (x) {
+    return Math.max(0, Math.min(1, x));
+  };
+  function circ(mo) {
+    var r = 0;
+    for (var y = 0; y < 5; y++) r += emit[y] * clamp((mo - 12 * y) / 12);
+    return {
+      developer: dev * clamp((mo - 12) / 36),
+      investors: inv * clamp((mo - 6) / 24),
+      liquidity: liq,
+      campaigns: camp * 0.5 + camp * 0.5 * clamp(mo / 12),
+      rewards: r,
+      total: 0,
+    };
+  }
+  function circTotal(mo) {
+    var c = circ(mo);
+    return c.developer + c.investors + c.liquidity + c.campaigns + c.rewards;
+  }
+  var MS = [0, 6, 12, 24, 36, 48, 60];
+  var pct = function (x) {
+    return (x / S) * 100;
+  };
+  var p1 = function (x) {
+    return x.toFixed(1).replace(/\.0$/, '') + '%';
+  };
+  var monthlyY1 = emit[0] / 12;
+  var capPerPlayer = monthlyY1 * 0.001;
+
+  var site = CFG.site ? CFG.site.replace(/^https?:\/\//, '') : 'cooked.app';
+  var sym = '$' + TK.symbol;
+
+  var sections = [];
+  function sec(id, title, blocks) {
+    sections.push({ id: id, title: title, blocks: blocks });
+  }
+  var P = function (x) {
+    return { t: 'p', x: x };
+  };
+  var H = function (x) {
+    return { t: 'h3', x: x };
+  };
+  var UL = function (items) {
+    return { t: 'ul', items: items };
+  };
+  var NOTE = function (x, kind) {
+    return { t: 'note', x: x, kind: kind || 'info' };
+  };
+
+  sec('summary', 'Summary', [
+    P(
+      'Cooked is a free-to-play game that runs in your browser. It is about surviving the daily problems of real life: the alarm that did not ring, a phone at 1%, traffic, rent, the message that was seen and never answered. You dodge life\'s problems, catch what cools you down, and see how long you can last.',
+    ),
+    P(
+      'The ' + sym + ' token is the planned on-chain currency of the Cooked world. People who play fairly and consistently earn it through seasonal rewards. Holders can use it for premium cosmetics and season passes, and can vote on new levels, problems and sponsors.',
+    ),
+    { t: 'kv', rows: [
+      ['Token', TK.name + ' (' + sym + ')'],
+      ['Total supply', n(S) + ', fixed. No new tokens can be created after launch.'],
+      ['Players and community', TK.players + '% (' + n(com) + ')'],
+      ['Investors', TK.investors + '% (' + n(inv) + ')'],
+      ['Developer', TK.developer + '% (' + n(dev) + ')'],
+      ['Network', 'Solana'],
+      ['Official sponsor', 'Solana'],
+      ['Partners', 'Bitget and KuCoin'],
+      ['Official website', site + ' (planned)'],
+      ['Status', 'Pre-launch. A 6-month plan. The token is not live.'],
+    ] },
+    NOTE('Fun comes first. Cooked is a game before it is anything else.', 'info'),
+  ]);
+
+  sec('why', 'Why Cooked', [
+    P('Everyone knows the feeling of a day where small problems stack up faster than you can clear them. Games about that feeling are instantly understood, instantly shared, and instantly funny, because they are about us.'),
+    UL([
+      'Relatable. The problems in Cooked are the ones people actually face: exams, rent, a dead battery, a weak signal, a boss who wants a call, family asking when you are getting married.',
+      'Easy to reach. It opens from a link in any phone browser. No download, no app store, no account to create.',
+      'Easy to share. Your result is one number and a picture that fits a group chat.',
+      'Proven appetite. Recent browser games built around everyday life reportedly drew millions of players within days of launch.',
+    ]),
+    H('What we do differently from most token games'),
+    P('Many earlier token games paid early players with money from later players, were overrun by bots, and collapsed when new buyers stopped arriving. Cooked is designed the other way round:'),
+    UL([
+      'The game must be fun without the token. Rewards are a bonus, not the reason to play.',
+      'The reward pool is paid from a fixed, published emission schedule. It never depends on new players depositing money.',
+      'Supply is fixed and public. No hidden minting, ever.',
+      'Anti-bot and anti-abuse controls are part of the design from day one, and the server, not the browser, decides who earned what.',
+    ]),
+  ]);
+
+  sec('game', 'The game', [
+    P('You are a glowing orb. Life problems fall toward you. Drag to dodge them and catch the things that cool you down. Your stress bar rises on its own and with every hit. At 100% you are cooked.'),
+    UL([
+      'Endless levels, unlocked by total coins. Level 1 starts at the 5,000 starter coins and every next level needs more total coins than the last. Student life, Job hunt, Adulting, Family & love, Parenting, Career climb, Building a home, Caring for parents, Planning ahead, then Life, Chapter 1, 2, 3 and so on forever.',
+      'Problems with weight. More than 70 everyday problems, each with a severity. Rent and hospital bills hurt more than a weak network.',
+      'Cooling items and power-ups. Coffee, a nap, a song, a friend\'s call. A shield blocks one hit. Slow motion slows time.',
+      'Life events. About once a minute you face a real decision with a trade-off: lend money to a friend, accept overtime, take a day off.',
+      'Daily challenges. Three real-life tasks each day that reset at midnight UTC.',
+      'Pause and resume, one revive per run, sound, orb looks, and a share card.',
+      'Sponsors. Solana is the official sponsor of Cooked. Solana, Bitget and KuCoin appear from time to time as clearly labelled billboards beside the track. Other brands can sponsor cooling items.',
+    ]),
+    NOTE('Live today in beta: everything above. Planned: the server-held economy, seasons, wallet linking and the token.', 'info'),
+  ]);
+
+  var LVNAMES = ['Student life', 'Job hunt', 'Adulting', 'Family & love', 'Parenting', 'Career climb', 'Building a home', 'Caring for parents', 'Planning ahead', 'Life, Chapter 1'];
+  var LV_E = CFG.levels || { base: 5000, step: 15000, power: 1.6 };
+  var levelRows = LVNAMES.map(function (nm, i) {
+    var need = i === 0 ? LV_E.base : Math.round((LV_E.base + LV_E.step * Math.pow(i, LV_E.power)) / 1000) * 1000;
+    return [String(i + 1), nm, n(need) + (i === 0 ? ' (the starter coins)' : '')];
+  });
+
+  sec('economy', 'Two-layer economy', [
+    P('Cooked has two kinds of value. Keeping them separate keeps the game fast and the token scarce.'),
+    { t: 'table', head: ['', 'Cooked Coins', sym + ' token'], rows: [
+      ['What it is', 'In-game points', 'On-chain token'],
+      ['How you get it', 'Playing: you earn coins by surviving, dodging problems and catching cooling items, and lose coins every time a problem hits', 'Seasonal rewards for verified fair play'],
+      ['What it buys', 'Shop items, revives, boosts', 'Premium cosmetics, season passes, votes'],
+      ['Supply', 'Open, but earning is slow by design', 'Fixed at ' + n(S)],
+      ['Can it leave the game?', 'No. Coins have no cash value and cannot be withdrawn', 'Yes, to your own wallet, after checks'],
+    ] },
+    H('Starter coins'),
+    P('New players start with ' + n(CFG.starterCoins) + ' coins. Starter coins are locked and cannot be sent to other players, so nobody can create many accounts to collect free coins.'),
+    H('Levels and total coins'),
+    P('Your level comes from your total coins: the ' + n(CFG.starterCoins) + ' starter coins plus everything you earn. Level 1 starts at the starter coins, and every new level needs more total coins than the one before, so each step is harder than the last. Coins are earned slowly on purpose, by surviving, dodging problems and catching cooling items, and every problem you hit takes coins off your balance. Neither hits nor spending in the shop ever lowers your level.'),
+    { t: 'table', head: ['Level', 'Stage', 'Total coins needed'], rows: levelRows },
+    P('After that the stages continue as Life, Chapter 2, 3 and so on, each one needing more total coins than the last, with no finish line.'),
+  ]);
+
+  sec('earn', 'How players earn ' + sym, [
+    P('Rewards are paid in seasons, one per month. The size of each season\'s pool is fixed by the emission schedule below, no matter how many people play. More players means a smaller slice each, never more tokens.'),
+    UL([
+      'Each season has a fixed pool of ' + sym + ' taken from the play rewards allocation.',
+      'Players earn Heat Points through verified play: levels reached, daily challenges, streaks, and a fair-play score.',
+      'At season end, the pool is divided in proportion to Heat Points, with a minimum to qualify and a cap per player.',
+      'Rewards are claimed to a wallet you link yourself, after anti-abuse checks. Larger claims may need identity verification where the law requires it.',
+      'It is free to take part. There is no entry fee, and paying money does not earn more tokens.',
+    ]),
+    { t: 'kv', rows: [
+      ['Average Year 1 season pool', m(monthlyY1) + ' ' + sym + ' (' + m(emit[0]) + ' over 12 months)'],
+      ['Proposed per-player cap', '0.1% of a season pool, about ' + n(capPerPlayer) + ' ' + sym + ' in Year 1'],
+      ['Illustration only', 'If 50,000 verified players share a Year 1 season pool evenly, each would receive about ' + n(monthlyY1 / 50000) + ' ' + sym + '. Real results depend on scores, caps and player numbers.'],
+    ] },
+  ]);
+
+  var allocRows = [
+    ['Players and community', TK.players + '%', n(com), 'Rewards, liquidity and campaigns (see below)'],
+    ['Investors', TK.investors + '%', n(inv), '6-month cliff, then 24 months linear'],
+    ['Developer', TK.developer + '%', n(dev), '12-month cliff, then 36 months linear'],
+    ['Total', '100%', n(S), ''],
+  ];
+  var commRows = [
+    ['Play rewards (seasons)', p1(pct(rew)), n(rew), 'Emitted over 5 years on a declining schedule'],
+    ['Liquidity', p1(pct(liq)), n(liq), 'Seeded at launch. LP tokens locked for at least 24 months'],
+    ['Community campaigns', p1(pct(camp)), n(camp), '50% at launch, 50% monthly over 12 months'],
+    ['Subtotal', TK.players + '%', n(com), ''],
+  ];
+  var circRows = MS.map(function (mo) {
+    var c = circTotal(mo);
+    return [mo === 0 ? 'Launch' : 'Month ' + mo, n(c), p1(pct(c))];
+  });
+
+  sec('tokenomics', 'Tokenomics', [
+    P('Total supply is ' + n(S) + ' ' + sym + '. It is created once, at launch, and the mint authority is permanently revoked, so no more can ever be created. The developer holds only ' + TK.developer + '%.'),
+    { t: 'chart', kind: 'alloc', data: { players: TK.players, investors: TK.investors, developer: TK.developer } },
+    H('Allocation'),
+    { t: 'table', head: ['Group', 'Share', 'Tokens', 'Release'], rows: allocRows },
+    H('How the players and community share is used'),
+    P('This is a proposed split of the ' + TK.players + '% community share. It does not change the three main groups above.'),
+    { t: 'table', head: ['Use', 'Of total supply', 'Tokens', 'Release'], rows: commRows },
+    H('Play rewards emission'),
+    P('Rewards are released on a declining schedule, so the early community is rewarded without flooding the market, and emissions end after five years.'),
+    { t: 'chart', kind: 'emission', data: emit },
+    H('Circulating supply over time'),
+    P('Circulating supply is the number of tokens that can be traded. It grows only as tokens unlock, as shown here. Liquidity pool tokens count as circulating from day one even though they are locked in the pool.'),
+    { t: 'chart', kind: 'circ', data: { pts: (function () { var a = []; for (var i = 0; i <= 60; i += 1) a.push([i, pct(circTotal(i))]); return a; })() } },
+    { t: 'table', head: ['When', 'Circulating', '% of supply'], rows: circRows },
+    H('Safeguards'),
+    UL([
+      'Fixed supply. The mint authority is permanently revoked after launch. The program source is public and verified.',
+      'Developer and investor tokens are held in on-chain vesting contracts. Anyone can check the unlock dates.',
+      'Admin keys are held in a multi-signature wallet with a time delay on changes.',
+      'Launch liquidity is locked for at least 24 months.',
+      'A public dashboard shows circulating, locked and burned supply.',
+    ]),
+  ]);
+
+  sec('utility', 'Token utility and sinks', [
+    H('What ' + sym + ' is for'),
+    UL([
+      'Premium cosmetics and seasonal orb looks.',
+      'Season passes with extra cosmetic rewards.',
+      'Voting on new levels, life problems and sponsor categories.',
+      'Early access to new worlds and features.',
+    ]),
+    H('What it is never for'),
+    UL([
+      'It never buys an advantage that increases how much you earn.',
+      'No paid tournament entry, no staked wagers, and no randomised paid loot boxes. Cooked will not work like a gambling product.',
+    ]),
+    H('Sinks'),
+    P('Half of every ' + sym + ' spent in the game is burned permanently. The other half returns to the rewards pool. This removes tokens from circulation as the game is used.'),
+  ]);
+
+  sec('fair', 'Fair play and anti-abuse', [
+    P('A token game fails if bots and cheaters take the rewards. So in Cooked the browser is never trusted with anything that has value.'),
+    H('Built and tested on the server side'),
+    UL([
+      'Balances are held by the server in a database, not in the browser.',
+      'Every run is timed by the server. What a run can earn is capped by how long it really lasted.',
+      'Daily earning caps, rate limits and one-use run settlement.',
+      'Coin transfers are atomic, so the same coins cannot be spent twice, even with many requests at once.',
+      'Starter coins are locked and cannot be moved to other accounts.',
+    ]),
+    H('Planned'),
+    UL([
+      'Sybil detection: scoring of devices, networks and behaviour to spot farms of fake accounts.',
+      'Minimum account age and activity before a first reward claim.',
+      'Identity verification above a claim threshold, where required by law.',
+      'Reversal of fraudulent rewards before they are claimed, and a public fair-play policy.',
+    ]),
+    NOTE('The server code is written and passes its security tests. It is being connected to the game in Month 1 of the plan.', 'info'),
+  ]);
+
+  sec('partners', 'Network and sponsors', [
+    P('Cooked is built to launch on Solana, and Solana is the official sponsor of Cooked. Bitget and KuCoin are partners.'),
+    UL([
+      'Solana. Official sponsor and launch network. Its fast, low-cost transactions suit a game with many small rewards.',
+      'Bitget. Partner of Cooked.',
+      'KuCoin. Partner of Cooked.',
+    ]),
+    P('Solana, Bitget and KuCoin appear in the game as clearly labelled billboards beside the track. They show up at random rather than on every run, so they never crowd out play. Neither sponsors nor partners receive tokens, rewards or any say over how rewards are paid.'),
+  ]);
+
+  sec('revenue', 'Revenue and sustainability', [
+    P('Cooked earns money from the game, not from selling the token to fund rewards.'),
+    UL([
+      'Sponsorships: labelled billboards and sponsored cooling items. Our official sponsor is Solana, with Bitget and KuCoin as partners.',
+      'Rewarded ads that players choose to watch.',
+    ]),
+    P('Revenue pays for servers, security and the team. A share may support rewards or token buy-backs under a policy that will be published and reviewed every quarter.'),
+    P('Because the rewards pool is fixed by the emission schedule, earlier players are never paid with later players\' deposits.'),
+  ]);
+
+  sec('roadmap', '6-month roadmap', [
+    P('The token will not launch until the criteria in the next section are met.'),
+    { t: 'table', head: ['Month', 'Focus', 'Goals'], rows: [
+      ['1', 'Foundation', 'Connect the secure server to the game. Register ' + site + '. Set up the legal entity. Engage securities counsel. Brand and community channels.'],
+      ['2', 'Closed beta', 'Invite-only beta. Tune difficulty and rewards from real play. Start development on Solana. Publish team profiles.'],
+      ['3', 'Public beta', 'Open the beta to everyone. Leaderboards and the seasons engine (points only, no token yet). Begin sybil detection. Prepare for audits.'],
+      ['4', 'Legal and security', 'Written legal opinion on token classification. Identity-check provider selected. Token and programs on Solana devnet. First independent audit begins.'],
+      ['5', 'Offering and audits', 'Investor allocation offered only through permitted and compliant channels. Second audit. Contracts verified. Liquidity plan finalised. Listing pack prepared.'],
+      ['6', 'Launch', 'Token generation event. Liquidity seeded and locked. First token season. Exchange applications begin after audits and traction are public.'],
+    ] },
+  ]);
+
+  var listing = [
+    ['Legal and regulatory', 'Written opinion from qualified securities counsel on how the token is classified. Offerings made only through permitted channels. Required filings made. Identity and anti-money-laundering checks for investors.', 'Required', '4'],
+    ['Team transparency', 'Founder identity verified and published. Public team profiles. Identity checks provided to exchanges on request.', 'Required', '2'],
+    ['Smart contract security', 'At least two independent audits. All critical and high findings fixed. Full reports published.', 'Required', '5'],
+    ['Contract integrity', 'Fixed supply with the mint authority revoked. Verified source on the block explorer. Admin keys in a multi-signature wallet with a time delay.', 'Required', '5'],
+    ['Token locks', 'Developer and investor vesting enforced on-chain. Launch liquidity locked for at least 24 months. All locks publicly viewable.', 'Required', '6'],
+    ['Supply transparency', 'Public dashboard and data feed for circulating, locked and burned supply, plus a published unlock calendar.', 'Required', '6'],
+    ['Real product, real users', 'Game live with verified, non-bot activity. Target: at least 10,000 monthly active players and a 30-day return rate of at least 10%.', 'Required', '6'],
+    ['Organic community', 'At least 25,000 genuine community members across channels. No bought followers or fake engagement.', 'Target', '6'],
+    ['Healthy distribution', 'No single unlocked wallet above 2% of circulating supply. Top 10 unlocked wallets below 20% of circulating supply (excluding locked and pool addresses).', 'Target', '6'],
+    ['Honest liquidity', 'Liquidity depth reviewed with independent advisers. No wash trading, no paid fake volume, no hidden market-maker loans.', 'Required', '6'],
+    ['Fair play', 'Published anti-abuse policy. Fraud and bot rates tracked and reported.', 'Required', '5'],
+    ['Operations', 'Incident response plan, bug bounty, support channel and public status page.', 'Required', '6'],
+    ['Disclosure and marketing', 'No price promises. Unsupported jurisdictions blocked.', 'Required', '5'],
+  ];
+  sec('listing', 'Listing criteria', [
+    P('We hold ourselves to a published bar. The token launches only when every item marked Required is complete. These are the standards we commit to, and they cover what exchanges and investors commonly look for.'),
+    { t: 'table', head: ['Area', 'Standard we commit to', 'Level', 'By month'], rows: listing },
+    H('The listing pack'),
+    P('When we apply to an exchange we will provide: this whitepaper, both audit reports, the legal opinion, the tokenomics and unlock schedule, contract addresses, verified team details, and live community and player metrics.'),
+    H('Where we list'),
+    UL([
+      'Month 6: a decentralised exchange pool, with liquidity locked.',
+      'After Month 6: applications to centralised exchanges, once audits, locks and player numbers can be shown publicly.',
+      'We will never pay secretly for a listing, inflate numbers, or misstate our status to an exchange.',
+    ]),
+  ]);
+
+  sec('legal', 'Legal and compliance approach', [
+    P('Digital assets are regulated in a growing number of countries, and the rules are still developing. We watch proposed changes closely and design Cooked to meet the requirements of every market where the token is offered.'),
+    UL([
+      'We will engage qualified securities counsel before any offering and follow their advice.',
+      'The investor allocation will be offered only through channels, and only to people, permitted by law. Required filings, including this whitepaper where applicable, will be made.',
+      'We will run identity and anti-money-laundering checks where required.',
+      'Where we cannot offer the token lawfully, we will not offer it.',
+      'No gambling features. No paid entry to prizes, and no randomised paid loot boxes.',
+      'A published privacy policy. We collect as little personal data as possible.',
+    ]),
+  ]);
+
+  sec('team', 'Team and governance', [
+    P('Cooked is created by an independent founder, called the Developer in this paper. The Developer holds ' + TK.developer + '% of supply, locked on-chain with a 12-month cliff, which is less than the investor allocation. Names, roles and verified profiles of the team will be published before the offering.'),
+    UL([
+      'Content votes. Token holders vote on new levels, problems and sponsor categories. The team keeps responsibility for safety and legal decisions.',
+      'Critical controls. Contract admin actions need several signers and a time delay, so changes can be seen before they take effect.',
+      'Reporting. Quarterly updates cover player numbers, revenue, reward distribution and token supply.',
+    ]),
+    P('Questions: ' + site + ' (planned).'),
+  ]);
+
+  return {
+    title: 'Cooked: Survive Real Life',
+    subtitle: 'Whitepaper v' + TK.version + ' · ' + TK.date,
+    version: TK.version,
+    sections: sections,
+    model: { S: S, dev: dev, inv: inv, com: com, liq: liq, camp: camp, rew: rew, emit: emit, circ: circTotal, MS: MS },
+  };
+}
+if (typeof module !== 'undefined') module.exports = { buildWhitepaper };
+
+</script>
+<script>
+const cv=document.getElementById('c'),g=cv.getContext('2d');
+let W,H,DPR;function rs(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;g.setTransform(DPR,0,0,DPR,0,0)}rs();addEventListener('resize',rs);
+const BAD=[['📚','Exam tomorrow'],['💸','Rent due'],['🔋','Phone at 1%'],['💬','Seen, no reply'],['⏰','Alarm didn\'t ring'],['📉','Salary delayed'],['🚦','Stuck in traffic'],['📶','No network'],['🧾','Surprise bill'],['📧','Per my last email'],['🦟','Mosquitoes all night'],['🔌','Power cut'],['⛽','Fuel price up'],['🚌','Missed the bus'],['🤒','Fell sick'],['📱','Cracked screen'],['🧺','Laundry pile'],['👀','Boss wants a call'],['🍜','Fridge is empty'],['💔','Ghosted'],['🪫','Data finished'],['🏦','Bank alert: debit']],
+COOL=[['☕',12,'Coffee break'],['😴',18,'Nap'],['🧊',26,'Cold drink'],['🎧',14,'Favorite song'],['🍕',16,'Good food'],['🫂',20,'Friend check-in']];
+let insOn=false,dblT=0,fastT=0,hustle=0,evT=45,lvl=0,runC=0,peakC=0,loss=0,stat={},S='menu',heat=0,t=0,items=[],parts=[],px=0,tx=0,shake=0,spawnT=0,waveT=0,combo=0,shield=0,slow=0,flash=0,hitFlash=0,best=0,last=0,scroll=0;
+try{best=+localStorage.getItem('cooked_best')||0}catch(e){}
+const $=id=>document.getElementById(id),keys={};
+function buzz(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
+function say(s){const m=$('msg');m.innerHTML=s;m.style.opacity=1;clearTimeout(say.k);say.k=setTimeout(()=>m.style.opacity=0,900)}
+function diff(){return 1+1.6*(1-Math.exp(-t/150))}
+const HY=()=>H*.3,PY=()=>H*.8;
+function proj(wx,d){const f=Math.pow(Math.max(1-d,0),1.7);return{x:W/2+wx*W*.5*(.1+.9*f),y:HY()+(PY()-HY())*f,s:.1+.9*f,f}}
+function spawn(wx,kind){items.push({wx,d:1,kind,e:kind.e,v:kind.v||0,cool:kind.cool||0,sev:kind.sev||0,lab:kind.lab||'',rot:Math.random()*6})}
+function startGame(){if(ld('cooked_intro',0))beginRun();else intro()}
+function beginRun(){S='play';lvl=lvlOf(tot);runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
+$('ov').classList.add('hide');$('hud').classList.remove('hide');$('pause').classList.remove('hide');say('Level 1: Student life')}
+function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*220;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,l:.7,c:col})}}
+const LV=[
+{name:'Student life',icon:'🎒',title:'Survived Exam Week',bad:[['📚','Exam tomorrow'],['📝','Assignment due midnight'],['😵','Group project drama'],['🔋','Phone at 1%'],['⏰',"Alarm didn't ring"],['💬','Seen, no reply'],['🪫','Data finished'],['🍜','Fridge is empty']]},
+{name:'Job hunt',icon:'🎓',title:'Graduated',bad:[['📧','Per my last email'],['📄',"We'll keep your CV"],['🚌','Missed the bus'],['🚦','Stuck in traffic'],['👀','Boss wants a call'],['📶','No network'],['🧑‍💼','Interview ghosted'],['📉','Salary delayed']]},
+{name:'Adulting',icon:'💼',title:'Landed a Job',bad:[['💸','Rent due'],['🧾','Surprise bill'],['⛽','Fuel price up'],['🔌','Power cut'],['🏦','Bank alert: debit'],['🧺','Laundry pile'],['🦟','Mosquitoes all night'],['📱','Cracked screen']]},
+{name:'Family & love',icon:'🏠',title:'Paid Your Own Rent',bad:[['📞','Mum is calling'],['💔','Ghosted'],['🎁','Wedding contribution'],['🤒','Fell sick'],['🏥','Hospital bill'],['💍','When are you marrying?'],['🙏','Family loan request'],['🛠️','Landlord repairs']]},
+{name:'Parenting',icon:'👶',title:'Became a Parent',bad:[['👶','Baby awake at 3am'],['🏫','School fees due'],['🍼','Diaper budget'],['🧸','Toy under your foot'],['📋','Parent meeting'],['🤧','Child fell sick'],['📚','Homework at 10pm'],['🍽️',"Child won't eat"]]},
+{name:'Career climb',icon:'📈',title:'Got Promoted',bad:[['📊','Targets doubled'],['🧑‍💼','Layoff rumours'],['📅','Back-to-back meetings'],['🖥️','System down at 2am'],['😤','Difficult boss'],['🛫','Surprise work trip'],['📨','Reply-all disaster'],['💼','Weekend work']]},
+{name:'Building a home',icon:'🏡',title:'Built a Home',bad:[['🧱','Cement price up'],['🏗️','Contractor vanished'],['📜','Land paper issues'],['🚰','Pipe burst'],['💡','Light bill'],['🔨','Project over budget'],['🌧️','Roof is leaking'],['🤝','Agent fees']]},
+{name:'Caring for parents',icon:'🧓',title:'Took Care of Parents',bad:[['💊',"Parents' medicine"],['🏥','Hospital bill'],['📞','Relative needs money'],['🎗️','Funeral contribution'],['🚗','Car broke down'],['💸','Everyone owes you'],['🏦','Loan repayment'],['🪪','Documents expired']]},
+{name:'Planning ahead',icon:'🌅',title:'Planned for the Future',bad:[['📉','Savings lost value'],['🏦','Pension confusion'],['🩺','Health check results'],['🧾','Tax season'],['📈','Prices went up again'],['🪙','Currency dropped'],['🗓️','Time is flying'],['🕰️','Where did the years go']]}];
+const ALLB=[].concat(...LV.map(l=>l.bad)),XI=['🌍','🚀','🏔️','🌟'];
+function LVL(i){if(i<LV.length)return LV[i];const n=i-LV.length+1;return{name:'Life, Chapter '+n,icon:XI[n%4],title:'Still Standing, Chapter '+n,bad:ALLB}}
+const thr=n=>n<=0?CFG.levels.base:Math.round((CFG.levels.base+CFG.levels.step*Math.pow(n,CFG.levels.power))/1000)*1000,lvlOf=x=>{let n=0;while(thr(n+1)<=x)n++;return n};
+function ld(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+let canSave=true;try{localStorage.setItem('cooked_t','1');canSave=localStorage.getItem('cooked_t')==='1'}catch(e){canSave=false}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const fmt=n=>Math.floor(n).toLocaleString('en-US');
+function chk(x){let h=7;for(const c of x+'cooked-v1')h=(h*31+c.charCodeAt(0))>>>0;return h.toString(36)}
+let bal=ld('cooked_bal',null),myId=ld('cooked_id',null),used=ld('cooked_used',[]);
+if(bal===null||!ld('cooked_v2',0)){bal=Math.min(bal===null?Infinity:bal,CFG.starterCoins);sv('cooked_bal',bal);sv('cooked_v2',1)}
+let tot=ld('cooked_tot',null);if(tot===null||tot<CFG.starterCoins){tot=Math.max(tot||0,bal,CFG.starterCoins);sv('cooked_tot',tot)}
+if(!myId){const a=new Uint16Array(2);(window.crypto||{getRandomValues(x){x[0]=Math.random()*65535;x[1]=Math.random()*65535}}).getRandomValues(a);const h=n=>n.toString(16).toUpperCase().padStart(4,'0');myId='CK-'+h(a[0])+'-'+h(a[1]);sv('cooked_id',myId)}
+function cpy(x,b){try{navigator.clipboard.writeText(x).then(()=>b.textContent='Copied',()=>b.textContent='Select and copy')}catch(e){b.textContent='Select and copy'}}
+function end(){const fails=ld('cooked_fails',0)+1;sv('cooked_fails',fails);S='over';buzz([60,40,120]);sfx('over');const sc=+t.toFixed(1);let nb=false;if(sc>best){best=sc;nb=true;try{localStorage.setItem('cooked_best',best)}catch(e){}}
+if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl);const raw=Math.floor(runC),net=raw,earn=Math.max(0,raw+Math.floor(loss)),done=checkCh(sc),bonus=done.reduce((a,c)=>a+c.rew,0);bal=Math.max(0,bal+net+bonus);sv('cooked_bal',bal);tot+=Math.max(0,net)+bonus;sv('cooked_tot',tot);
+$('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails})}
+function showOver(r){const V=LVL(r.L);
+const lo=thr(r.L),hi=thr(r.L+1),pg=Math.max(0,Math.min(100,Math.round((tot-lo)/(hi-lo)*100))),more=r.n<2;
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(r.L+1).icon} ${LVL(r.L+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(tot)} / ${fmt(hi)} total coins</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double coins</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
+$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
+$('share').onclick=()=>{const m=`I reached Level ${r.L+1} (${V.title}) in Cooked: ${r.sc.toFixed(1)}s and ${fmt(bal)} Cooked Coins. Beat that:`,u=CFG.site||location.href;
+if(navigator.share)navigator.share({text:m,url:u}).catch(()=>{});else try{navigator.clipboard.writeText(m+' '+u);$('share').textContent='Copied'}catch(e){}}}
+function wallet(back=menu){
+let sol=ld('cooked_sol','');
+$('card').innerHTML=`<h1><i class=cc></i> Wallet</h1><p class="small">Your Cooked Coins</p><div class="big" id="bal" style="font-size:38px">${fmt(bal)}</div><p class="small">Total earned so far: ${fmt(tot)} <i class=cc></i></p><p class="small">These are your cooked coins. They are in-game points with no cash value yet. The $COOKED token is not live yet, so keep playing and keep stacking them.</p><p>Submit your Solana (SOL) address</p><p class="small">Add the wallet address you want linked to your coins so you are on the list when $COOKED launches. Never share a seed phrase or private key. We only ever need the public address.</p><input id="sol" placeholder="Your Solana address" autocomplete="off" autocapitalize="off" spellcheck="false" value="${sol}"><button id="solsv">${sol?'Update address':'Submit address'}</button><div id="res"></div><button class="alt" id="bk">Back</button>`;
+$('bk').onclick=back;
+if(sol)$('res').textContent='Saved address: '+sol.slice(0,4)+'...'+sol.slice(-4);
+$('solsv').onclick=()=>{const v=$('sol').value.trim(),r=$('res');
+if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)){r.textContent='That does not look like a valid Solana address. It is 32 to 44 letters and numbers.';return}
+sv('cooked_sol',v);$('solsv').textContent='Update address';r.textContent='Address saved: '+v.slice(0,4)+'...'+v.slice(-4)+'. You have '+fmt(bal)+' cooked coins ready.'}}
+const SEV={'💸':5,'🏥':5,'🧾':4,'🏦':4,'📉':4,'🤒':4,'🙏':4,'💔':4,'⛽':3,'📱':3,'🔌':3,'🎁':3,'📚':3,'🧑‍💼':3,'🛠️':3,'📝':2,'😵':2,'⏰':2,'📄':2,'🚌':2,'👀':2,'💍':2,'🔋':1,'💬':1,'🪫':1,'🍜':1,'📧':1,'🚦':1,'📶':1,'🧺':1,'🦟':1,'📞':1},PEN=[0,5,10,20,30,50];Object.assign(SEV,{'🏫':4,'👶':3,'🤧':3,'🍼':2,'🧱':3,'🏗️':4,'📜':4,'🚰':3,'🔨':4,'🌧️':3,'💊':3,'🎗️':3,'🚗':4,'🪪':2,'📊':3,'🖥️':3,'😤':3,'🩺':3,'🪙':4,'🤝':3});
+const CH=[{id:'rush',name:'Morning Rush',txt:'Survive 20 seconds',rew:100,f:(s,t)=>t>=20},
+{id:'bills',name:'Pay the Bills',txt:'Reach Level 3: Adulting',rew:300,f:(s,t,l)=>l>=2},
+{id:'calm',name:'Keep Calm',txt:'Catch 6 cooling items in one run',rew:100,f:s=>s.caught>=6},
+{id:'drama',name:'Dodge the Drama',txt:'Dodge 20 problems in one run',rew:120,f:s=>s.dodged>=20},
+{id:'care',name:'Self-Care Streak',txt:'Catch 5 cooling items in a row',rew:200,f:s=>s.combo>=5},
+{id:'planb',name:'Plan B',txt:'Block a problem with a shield',rew:80,f:s=>s.shield>0},
+{id:'ot',name:'Overtime',txt:'Survive 90 seconds',rew:300,f:(s,t)=>t>=90},
+{id:'slow',name:'Slow Down',txt:'Grab the ⏳ power-up',rew:80,f:s=>s.slow>0},
+{id:'clean',name:'Clean Record',txt:'Survive 25 seconds with zero hits',rew:200,f:(s,t)=>t>=25&&s.hits===0}];
+const todays=()=>{const k=Math.floor(Date.now()/864e5)%CH.length;return[0,3,6].map(i=>CH[(k+i)%CH.length])};
+function chState(){const d=new Date().toISOString().slice(0,10);let c=ld('cooked_ch',null);if(!c||c.d!==d){c={d,done:[]};sv('cooked_ch',c)}return c}
+function checkCh(sc){const c=chState(),out=[];for(const h of todays())if(!c.done.includes(h.id)&&h.f(stat,sc,lvl)){c.done.push(h.id);out.push(h)}sv('cooked_ch',c);return out}
+function challenges(){const c=chState();$('card').innerHTML=`<h2>🎯 Daily challenges</h2><p class="small">Real-life tasks. They reset every day. Finish one in a run to earn the coins.</p>${todays().map(h=>`<div class="ch ${c.done.includes(h.id)?'ok':''}"><div><b>${h.name}</b><br><small>${h.txt}</small></div><div>${c.done.includes(h.id)?'✅':'<i class=cc></i> '+fmt(h.rew)}</div></div>`).join('')}<button id="go">Play</button><button class="alt" id="bk">Back</button>`;$('go').onclick=startGame;$('bk').onclick=menu}
+function howto(){$('card').innerHTML=`<h2>❓ How to play</h2>
+<div class="leg bad"><b>Dodge</b><span>📚 💸 🔋 💬 ⏰</span><small>Life problems add stress and cost coins. Big ones like 💸 and 🏥 cost the most.</small></div>
+<div class="leg good"><b>Catch</b><span>☕ 😴 🧊 🎧 🍕 🫂</span><small>Cool you down. Chain 4 for a bonus.</small></div>
+<div class="leg pw"><b>Power-ups</b><span>🛡️ ⏳</span><small>Block a hit, or slow time</small></div>
+<p class="how">Drag left and right, or use the arrow keys. You earn coins every second, and every problem that hits you takes coins off your balance. The total coins you earn set your level, and every level needs more than the last.</p><button id="wi">▶ Watch intro</button><button class="alt" id="bk">Back</button>`;$('bk').onclick=menu;$('wi').onclick=intro}
+function airdrop(){const hasSol=!!ld('cooked_sol','');
+$('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision for the next 6 months: take Cooked from a browser game to a live token on Solana, with the players who got us there first in line.</p>
+<h3 class="ah">The 6-month plan</h3>
+<ul class="al"><li><b>Months 1-2:</b> Foundation and closed beta. Connect the secure server, invite-only testing, tune rewards.</li><li><b>Month 3:</b> Public beta for everyone. Leaderboards and seasons (points only).</li><li><b>Month 4:</b> Legal review, anti-bot checks, devnet token, first audit.</li><li><b>Month 5:</b> Second audit, contracts verified, liquidity plan finalised.</li><li><b>Month 6:</b> Token launch and the first airdrop and reward season.</li></ul>
+<h3 class="ah">Criteria before launch</h3>
+<ul class="al ck"><li>1,000,000 players reached</li><li>250,000 Solana wallet addresses submitted</li><li>Daily active community and growing social channels</li><li>Smart contracts audited and verified</li><li>Legal opinion on the token completed</li><li>Liquidity seeded and locked</li><li>Anti-bot and fair-play checks live</li></ul>
+<h3 class="ah">How to qualify for the airdrop</h3>
+<ul class="al"><li>Play regularly and build up your cooked coins.</li><li>Complete daily challenges and climb the levels.</li><li>Submit your Solana address in the wallet.</li><li>Play fair. Bots and multiple accounts are removed.</li><li>Invite friends and share your results.</li></ul>
+<p class="small">Airdrop allocations come from the community campaigns share of the supply and are based on verified play. Goals and dates can change as we build, and we will announce updates in the game.</p>
+<button class="play" id="adw">${hasSol?'Update my Solana address':'Submit my Solana address'}</button><button class="alt" id="bk">Back</button>`;
+$('bk').onclick=menu;$('adw').onclick=()=>wallet(airdrop)}
+function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(tot)+1}: ${LVL(lvlOf(tot)).name} · ${fmt(tot)} / ${fmt(thr(lvlOf(tot)+1))} total coins</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your coins.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of coins? Play a run or watch an ad in the shop to earn more.</p>':''}`;
+$('go').onclick=startGame;$('mc').onclick=challenges;$('ma').onclick=airdrop;$('mw').onclick=()=>wallet(menu);$('mh').onclick=howto;$('ms').onclick=()=>shop(menu);$('mm').onclick=toggleMute;$('mp').onclick=()=>openWP();$('mtk').onclick=()=>openWP('tokenomics')}
+
+const CAP=[[0,'COOKED','Survive real life.',1],[1.6,'This is you','A calm little orb. Keep your stress low.'],[3.4,'Life throws problems at you','Exams, low battery, no reply. Dodge them.'],[6.4,'Get hit and it costs you','Stress goes up and coins drop. Big problems cost more.'],[9.2,'Small joys cool you down','Coffee, rest, music. Catch them to calm down.'],[12.2,'Level up through real life','Student, job, family and beyond. It never ends.'],[14.8,'How long can you stay cool?','Drag left and right to move.']];
+const EV=[[3.4,'📚','Exam tomorrow','d'],[4.1,'🔋','Phone at 1%','d'],[4.8,'💬','Seen, no reply','d'],[6.2,'💸','Rent due','h',5],[6.9,'🧾','Surprise bill','h',4],[9,'☕','Coffee break','c'],[9.7,'😴','Nap','c'],[10.4,'🎧','Favorite song','c']];
+let iT=0,iE=0,iC=-1;const pxF=x=>.55*Math.sin(x*1.3),TR=1.62;
+function setCap(a,b,big){const c=$('cap');$('ct').textContent=a;$('cs').textContent=b;c.classList.remove('in','big');void c.offsetWidth;c.classList.add('in');if(big)c.classList.add('big')}
+function intro(){S='intro';iT=0;iE=0;iC=-1;items=[];parts=[];heat=10;runC=0;shield=0;slow=0;combo=0;px=tx=0;shake=0;flash=0;hitFlash=0;
+$('ov').classList.add('hide');$('hud').classList.remove('hide');$('t').textContent='😰 Stress';['skip','cap'].forEach(i=>$(i).classList.remove('hide'));['lvls','hand'].forEach(i=>$(i).classList.add('hide'))}
+function endIntro(){['skip','cap','lvls','hand'].forEach(i=>$(i).classList.add('hide'));sv('cooked_intro',1);beginRun()}
+function skipIntro(){if(S==='intro')endIntro()}
+$('skip').onclick=skipIntro;
+function introStep(dt){iT+=dt;scroll+=dt*.9;
+while(iE<EV.length&&iT>=EV[iE][0]){const e=EV[iE++];let w=pxF(iT+TR);if(e[3]==='d')w+=w>0?-.6:.6;w=Math.max(-.95,Math.min(.95,w));spawn(w,{e:e[1],lab:e[2],v:e[3]==='c'?2:1,sev:e[4]||2,cool:0})}
+while(iC+1<CAP.length&&iT>=CAP[iC+1][0]){iC++;const c=CAP[iC];setCap(c[1],c[2],c[3]);
+if(iC===5){$('lvls').innerHTML=LV.slice(0,4).concat([{icon:'♾️',name:'No finish line'}]).map((l,i)=>`<div style="animation-delay:${i*.3}s"><span>${l.icon}</span><small>${l.name}</small></div>`).join('');$('lvls').classList.remove('hide')}
+if(iC===6){$('lvls').classList.add('hide');$('hand').classList.remove('hide')}}
+px=pxF(iT);if(iT>1.6)runC+=dt*CFG.earn.perSec;if(iT>3.4&&iT<9)heat+=dt*1.5;
+for(const it of items){it.d-=.6*dt;it.rot+=dt*2;
+if(it.d<.07&&it.d>-.08&&!it.done&&Math.abs(it.wx-px)<.19){it.done=1;const p=proj(px,0);
+if(it.v===1){heat+=14;shake=14;hitFlash=.35;runC-=PEN[it.sev]||2500;buzz(60);burst(p.x,p.y-30,'#ff4d3a',24);say(it.lab+'  -'+fmt(PEN[it.sev]||2500)+' <i class=cc></i>')}
+else{heat-=10;flash=.25;buzz(15);burst(p.x,p.y-30,'#8fe9ff',26);say(it.lab)}}}
+items=items.filter(i=>i.d>-.34&&!i.done);
+for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=380*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);
+shake=Math.max(0,shake-dt*40);flash=Math.max(0,flash-dt);hitFlash=Math.max(0,hitFlash-dt);
+heat=Math.max(6,Math.min(95,heat));
+$('fill').style.width=heat+'%';$('heat').textContent=Math.round(heat)+'%';$('st').innerHTML='<i class=cc></i> '+fmt(Math.max(0,bal+runC));
+if(iT>=17.5)endIntro()}
+
+
+let inv=Object.assign({skin:'Classic',owned:['Classic'],shield:0,ins:0,adAt:0},ld('cooked_inv',{})),mute=ld('cooked_mute',false),AC=null;
+const sinv=()=>sv('cooked_inv',inv);
+const SK=[{n:'Classic',cost:0,a:[200,170,255],b:[150,90,255]},{n:'Gold',cost:2000,a:[255,226,140],b:[255,176,40]},{n:'Neon',cost:3500,a:[170,255,196],b:[60,230,120]}];
+function skinCol(h,k){const sk=SK.find(x=>x.n===inv.skin)||SK[0],hot=k==='a'?[255,120,80]:[255,70,50];return sk[k].map((v,i)=>Math.round(v+(hot[i]-v)*h*.8))}
+(CFG.sponsors||[]).filter(x=>x.kind==='cool').forEach(x=>COOL.push([x.emoji,x.cool||20,'Sponsored: '+x.name]));
+const spon=()=>{const bs=(CFG.sponsors||[]).filter(x=>x.kind==='billboard'),b=bs.find(x=>x.official)||bs[0];return b?`<p class="small">Sponsored by <b style="color:${b.color||'#ff9f43'}">${b.name}</b></p>`:''};
+addEventListener('pointerdown',()=>{if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume()});
+function tone(f,d,ty,v,sl,dl){if(!AC||mute)return;const t0=AC.currentTime+(dl||0),o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,t0);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+sl),t0+d);g.gain.setValueAtTime(v||.15,t0);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+d)}
+function sfx(k){if(k==='hit'){tone(160,.3,'sawtooth',.22,-110);tone(90,.35,'square',.12,-40)}else if(k==='cool'){tone(880,.14,'sine',.16);tone(1320,.2,'sine',.14,0,.08)}else if(k==='pw'){tone(520,.12,'triangle',.16);tone(780,.12,'triangle',.16,0,.1);tone(1040,.2,'triangle',.16,0,.2)}else if(k==='lvl'){[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.16,0,i*.09))}else if(k==='over')tone(330,.6,'sawtooth',.2,-250);else if(k==='ui')tone(600,.05,'sine',.08)}
+function toggleMute(){mute=!mute;sv('cooked_mute',mute);$('mm').textContent=mute?'🔇 Sound off':'🔊 Sound on';sfx('ui')}
+function runAd(kind,cb){if(CFG.adHandler){Promise.resolve(CFG.adHandler(kind)).then(ok=>{if(ok)cb()}).catch(()=>say('Ad failed. Try again.'));return}
+if(CFG.demo){const o=$('adov');o.classList.remove('hide');setTimeout(()=>{o.classList.add('hide');cb()},2500);return}say('Ads are not connected yet')}
+let shopMsg=null,shopJust=null;
+function shop(back=menu){const free=Date.now()-(inv.adAt||0)>=300000,m=shopMsg,j=shopJust;shopMsg=null;shopJust=null;
+const jc=id=>j===id?' just':'';
+$('card').innerHTML=`<h2>🛒 Shop</h2><div class="chip"><i class=cc></i> ${fmt(bal)}</div>${CFG.demo?'<p class="small">Demo mode: ads are simulated.</p>':''}<div id="shn" aria-live="polite">${m?`<div class="shmsg ${m.t||''}"><b>${m.h}</b>${m.b||''}${m.s?'<small>'+m.s+'</small>':''}</div>`:''}</div><button class="alt${jc('fa')}" style="width:100%" id="fa" ${free?'':'disabled'}>${free?'📺 Watch an ad: +'+fmt(CFG.rewards.free)+' <i class=cc></i>':'📺 Free coins available soon'}</button><p class="small">Orb looks</p><div class="grid">${SK.map((k,i)=>`<button class="alt${jc('sk'+i)}" id="sk${i}">${inv.owned.includes(k.n)?(inv.skin===k.n?'✓ '+k.n+'<span class="d">Equipped</span>':k.n+'<span class="d">Owned · tap to equip</span>'):k.n+'<br><small>'+fmt(k.cost)+' <i class=cc></i></small>'}</button>`).join('')}</div><p class="small">Boosts for your next run</p><div class="grid"><button class="alt${jc('bs')}" id="bs">🛡️ Start shield<br><small>250 <i class=cc></i> · you have ${inv.shield}</small><span class="d">Blocks the first problem that hits you</span></button><button class="alt${jc('bi')}" id="bi">🧾 Insurance<br><small>400 <i class=cc></i> · you have ${inv.ins}</small><span class="d">Halves coins lost from hits for one run</span></button></div><button class="alt" style="width:100%;margin-top:10px" id="bk">Back</button>`;
+const say_=(o,id)=>{shopMsg=o;shopJust=id||null;shop(back)},buy=(c,id,f,o)=>{if(bal<c){say_({t:'bad',h:'Not enough coins',b:'You need '+fmt(c-bal)+' more. Play a run or watch an ad to earn them.'},null);return}bal-=c;sv('cooked_bal',bal);f();sinv();say_(o(),id)};
+$('fa').onclick=()=>{if(!free)return;runAd('free',()=>{bal+=CFG.rewards.free;sv('cooked_bal',bal);inv.adAt=Date.now();sinv();say_({t:'ok',h:'+'+fmt(CFG.rewards.free)+' coins added',b:'Thanks for watching! Your balance is now '+fmt(bal)+'.'},'fa')})};
+SK.forEach((k,i)=>$('sk'+i).onclick=()=>{if(inv.owned.includes(k.n)){inv.skin=k.n;sinv();say_({t:'ok',h:k.n+' equipped',b:'Your orb will look like this in your next run.'},'sk'+i)}else buy(k.cost,'sk'+i,()=>{inv.owned.push(k.n);inv.skin=k.n},()=>({h:'✅ Purchased: '+k.n+' orb',b:'It is yours forever and already equipped. Spent '+fmt(k.cost)+' coins.',s:'Tap any look you own to switch.'}))});
+$('bs').onclick=()=>buy(250,'bs',()=>inv.shield++,()=>({h:'✅ Purchased: Start shield',b:'🛡️ Your next run begins with a shield that blocks the first problem that hits you, so no coins lost. One shield is used up per run.',s:'You now have '+inv.shield+' · Spent 250 coins'}));
+$('bi').onclick=()=>buy(400,'bi',()=>inv.ins++,()=>({h:'✅ Purchased: Insurance',b:'🧾 During your next run, every hit takes only half the usual coins off your balance. One insurance is used up per run.',s:'You now have '+inv.ins+' · Spent 400 coins'}));
+$('bk').onclick=back}
+function offerRevive(){S='revive';stat.rev=1;sfx('over');$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
+$('card').innerHTML=`<h2>😵 You're cooked!</h2><p>Stress hit 100%. Take one second chance this run.</p><button class="play" id="rv1" ${bal>=CFG.reviveCost?'':'disabled'}><i class=cc></i> Revive · ${fmt(CFG.reviveCost)}</button><button class="alt" id="rv2" style="width:100%">📺 Watch an ad to revive</button><button class="alt" id="rv3" style="width:100%">No thanks</button>`;
+const go=()=>{$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');heat=40;shield=1;S='cd';cdT=3;cdN=0;sfx('pw')};
+$('rv1').onclick=()=>{if(bal<CFG.reviveCost)return;bal-=CFG.reviveCost;sv('cooked_bal',bal);go()};$('rv2').onclick=()=>runAd('revive',go);$('rv3').onclick=()=>{$('ov').style.background='';end()}}
+const EVS=[{e:'🤝',h:'Friend needs a loan',p:'"Just till month end," they say.',a:['Lend 50 <i class=cc></i> (+shield)',()=>{runC-=50;shield=1}],b:['Refuse (+8 stress)',()=>{heat+=8}]},
+{e:'💼',h:'Overtime offer',p:'Boss: "Double pay, but it will be busy."',a:['Accept: 2x coins, faster problems (20s)',()=>{dblT=20;fastT=20}],b:['Decline',()=>{}]},
+{e:'🏖️',h:'Take a day off?',p:'You are exhausted.',a:['Rest: -30 <i class=cc></i>, -35% stress',()=>{runC-=30;heat=Math.max(0,heat-35)}],b:['Keep pushing',()=>{}]},
+{e:'📈',h:'Side hustle',p:'A friend shares a business idea.',a:['Invest 60 <i class=cc></i>: coins x1.5 this run',()=>{runC-=60;hustle=1}],b:['Not now',()=>{}]},
+{e:'🏠',h:'Rent increase',p:'Landlord: "Prices have gone up."',a:['Pay now: -50 <i class=cc></i>',()=>{runC-=50}],b:['Negotiate (+10 stress)',()=>{heat+=10}]},
+{e:'🍲',h:'Mum sent food',p:'Jollof, plantain and a long phone call.',a:['Enjoy it: -15% stress',()=>{heat=Math.max(0,heat-15)}],b:['Save it for later',()=>{}]}];
+function lifeEvent(){S='event';sfx('ui');const v=EVS[Math.random()*EVS.length|0];$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
+$('card').innerHTML=`<div class="big" style="font-size:52px">${v.e}</div><h2>${v.h}</h2><p>${v.p}</p><button class="play" id="ea">${v.a[0]}</button><button class="alt" id="eb" style="width:100%">${v.b[0]}</button>`;
+const pick=f=>{f();$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=2;cdN=0};
+$('ea').onclick=()=>pick(v.a[1]);$('eb').onclick=()=>pick(v.b[1])}
+const bbSalt=Math.random()*1e4;
+const bbR=(a,b)=>{const x=Math.sin(a*127.1+b*311.7+bbSalt)*43758.5453;return x-Math.floor(x)};
+function bbRR(g,x,y,w,h,r){g.beginPath();if(g.roundRect)g.roundRect(x,y,w,h,r);else g.rect(x,y,w,h)}
+function drawBoards(){const bs=(CFG.sponsors||[]).filter(x=>x.kind==='billboard');if(!bs.length)return;
+for(let k=0;k<4;k++){const t=scroll*.1+k/4,cyc=Math.floor(t),f=t-cyc;if(bbR(cyc,k)>.4)continue;const dd=1-f;if(dd>.97)continue;
+const b=bs[Math.floor(bbR(cyc,k+9)*bs.length)],p=proj((k%2?1:-1)*1.2,dd),w=150*p.s,h=76*p.s,col=b.color||'#ff9f43',col2=b.color2||col,x0=p.x-w/2,y0=p.y-h*1.6;
+g.globalAlpha=Math.min(1,f*4)*.92;
+g.fillStyle='rgba(180,150,230,.5)';g.fillRect(p.x-1.5*p.s,p.y-h*.6,3*p.s,h*.6);
+const gr=g.createLinearGradient(x0,y0,x0+w,y0+h);gr.addColorStop(0,'rgba(34,12,62,.95)');gr.addColorStop(1,'rgba(12,4,28,.95)');
+g.save();g.shadowColor=col;g.shadowBlur=14*p.s;bbRR(g,x0,y0,w,h,8*p.s);g.fillStyle=gr;g.fill();
+const sg=g.createLinearGradient(x0,y0,x0+w,y0);sg.addColorStop(0,col);sg.addColorStop(1,col2);g.strokeStyle=sg;g.lineWidth=Math.max(1,2*p.s);g.stroke();g.restore();
+g.textBaseline='middle';g.textAlign='center';g.fillStyle=sg;g.font='800 '+Math.max(7,17*p.s)+'px sans-serif';g.fillText(b.name,p.x,y0+h*.44);
+g.fillStyle='#e8dcff';g.font=Math.max(6,9*p.s)+'px sans-serif';g.fillText(b.tag||'',p.x,y0+h*.72);
+const pw=46*p.s,ph=11*p.s;bbRR(g,x0+6*p.s,y0+5*p.s,pw,ph,ph/2);g.fillStyle='rgba(255,255,255,.14)';g.fill();
+g.fillStyle='#cdbdf0';g.font='700 '+Math.max(4,6.5*p.s)+'px sans-serif';g.textAlign='left';g.fillText('SPONSORED',x0+10*p.s,y0+5*p.s+ph/2);g.textAlign='center'}
+g.globalAlpha=1}
+function shareCard(r){const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),V=LVL(r.L),gr=x.createLinearGradient(0,0,0,1350);gr.addColorStop(0,'#2b1650');gr.addColorStop(1,'#5a1008');x.fillStyle=gr;x.fillRect(0,0,1080,1350);x.textAlign='center';
+const T=(t,y,f,col)=>{x.font=f;x.fillStyle=col;x.fillText(t,540,y)};
+T('COOKED',170,'bold 120px sans-serif','#fff');T('Survive real life',245,'60px sans-serif','#d8c8ee');T(V.icon,560,'260px '+EF,'#fff');T(V.title,700,'bold 76px sans-serif','#ffd75e');
+T('Level '+(r.L+1)+': '+V.name,790,'52px sans-serif','#fff');T(r.sc.toFixed(1)+'s',960,'bold 130px sans-serif','#fff');
+T((r.net>=0?'+':'')+fmt(r.net)+' Cooked Coins',1050,'56px sans-serif',r.net>=0?'#8fffa8':'#ff9f8f');T('Lost '+fmt(r.loss)+' to life problems',1120,'44px sans-serif','#d8c8ee');T('Can you beat this?',1260,'bold 52px sans-serif','#ff9f43');
+c.toBlob(async b=>{if(!b)return;const f=new File([b],'cooked.png',{type:'image/png'});
+try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'Can you beat this? '+(CFG.site||location.href)});return}}catch(e){}
+try{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='cooked.png';a.click()}catch(e){}},'image/png')}
+
+menu();
+function setX(cx){tx=Math.max(-1,Math.min(1,(cx/W*2-1)/.92))}
+let down=false;
+cv.addEventListener('pointerdown',e=>{down=true;setX(e.clientX)});
+addEventListener('pointerup',()=>down=false);
+cv.addEventListener('pointermove',e=>{if(down||e.pointerType==='mouse')setX(e.clientX)});
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='Escape'&&wpOpen){closeWP();return}keys[e.key]=1;if(spl&&(e.key==='Enter'||e.key===' ')){endSplash();return}if(S==='intro'&&(e.key==='Enter'||e.key===' ')){skipIntro();return}if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(S==='play')pauseGame();else if(S==='paused')resume();return}if((e.key==='Enter'||e.key===' ')&&S!=='play'){const b=$('again')||$('go');b&&b.click()}});
+addEventListener('keyup',e=>keys[e.key]=0);
+function upd(dt){
+ if(keys.ArrowLeft)tx=Math.max(-1,tx-dt*2.2);if(keys.ArrowRight)tx=Math.min(1,tx+dt*2.2);
+ px+=(tx-px)*Math.min(1,dt*14);
+ const sp=slow>0?.5:1;slow=Math.max(0,slow-dt);
+ t+=dt;peakC=Math.max(peakC,runC);const nl=lvlOf(tot+peakC);if(nl>lvl){lvl=nl;heat=Math.max(0,heat-12);runC+=lvl*CFG.rewards.levelUp;say('Level '+(lvl+1)+': '+LVL(lvl).name+'  +'+fmt(lvl*CFG.rewards.levelUp)+' <i class=cc></i>');flash=.3;buzz(30);sfx('lvl')}const D=diff();runC+=dt*CFG.earn.perSec*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1);dblT=Math.max(0,dblT-dt);fastT=Math.max(0,fastT-dt);evT-=dt;if(evT<=0&&heat<85){evT=50+Math.random()*20;lifeEvent();return}
+ heat+=dt*(.9+D*.5);
+ scroll+=dt*sp*D*.9;
+ spawnT-=dt*sp;
+ if(spawnT<=0){spawnT=Math.max(.32,.85-t/400)*(.8+Math.random()*.4)*(fastT>0?.7:1);
+  const r=Math.random(),wx=Math.random()*1.7-.85;
+  if(r<.62){const pl=LVL(lvl).bad.concat(lvl?LVL(lvl-1).bad:[]);const b=pl[Math.random()*pl.length|0];spawn(wx,{e:b[0],lab:b[1],v:1,sev:SEV[b[0]]||2})}
+  else if(r<.9){const c=COOL[Math.random()*COOL.length|0];spawn(wx,{e:c[0],lab:c[2],v:2,cool:c[1]})}
+  else spawn(wx,Math.random()<.5?{e:'🛡️',v:3}:{e:'⏳',v:4})}
+ waveT-=dt;if(waveT<=0){waveT=20;const gap=Math.random()*5|0;say('Deadline wave!');buzz(40);for(let i=0;i<5;i++)if(i!==gap)spawn(-.8+i*.4,{e:'⏰',lab:'Deadline',v:1,sev:3})}
+ const v=(.42+.22*D)*sp;
+ for(const it of items){it.d-=v*dt;it.rot+=dt*2}
+ for(const it of items){if(it.d<.07&&it.d>-.08&&!it.done&&Math.abs(it.wx-px)<.19){it.done=1;
+   const p=proj(px,0);
+   if(it.v===1){if(shield){shield=0;burst(p.x,p.y-30,'#7fd6ff',18);stat.shield=1;sfx('pw');say('Blocked!')}else{const q_=it.sev||2,pen=Math.round(PEN[q_]*(insOn?.5:1));heat+=7+q_*2.5+D;shake=8+q_*3;hitFlash=.2+q_*.06;combo=0;stat.hits++;runC-=pen;loss+=pen;buzz(40+q_*25);sfx('hit');say(it.lab+'  -'+fmt(pen)+' <i class=cc></i>');$('st').classList.add('hit');setTimeout(()=>$('st').classList.remove('hit'),400);burst(p.x,p.y-30,'#ff4d3a',24)}}
+   else if(it.v===2){heat-=it.cool;combo++;const cg=Math.round((CFG.earn.catch+CFG.earn.combo*Math.min(combo,8))*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1));runC+=cg;sfx('cool');stat.caught++;stat.combo=Math.max(stat.combo,combo);flash=.25;buzz(15);burst(p.x,p.y-30,'#8fe9ff',26);if(combo%4===0){heat-=6;say('Chain x'+combo+'  +'+cg+' <i class=cc></i>')}else say(it.lab+'  +'+cg+' <i class=cc></i>')}
+   else if(it.v===3){shield=1;sfx('pw');burst(p.x,p.y-30,'#7fd6ff',22);say('Shield up')}
+   else{slow=4;stat.slow=1;sfx('pw');burst(p.x,p.y-30,'#ffe27a',22);say('Slow motion')}}}
+ for(const i of items)if(i.d<=-.1&&!i.done&&!i.cnt&&i.v===1){i.cnt=1;stat.dodged++;runC+=CFG.earn.dodge*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1)}items=items.filter(i=>i.d>-.34&&!i.done);
+ for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=380*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);
+ shake=Math.max(0,shake-dt*40);flash=Math.max(0,flash-dt);hitFlash=Math.max(0,hitFlash-dt);
+ heat=Math.max(0,heat);if(heat>=100){heat=100;if(stat.rev)end();else offerRevive()}
+ $('fill').style.width=heat+'%';$('heat').textContent=Math.round(heat)+'%';$('t').textContent=LVL(lvl).icon+' Lv'+(lvl+1)+' · '+t.toFixed(1)+'s';
+ $('st').innerHTML=(shield?'🛡️ ':'')+(slow>0?'⏳ ':'')+'<i class=cc></i> '+fmt(Math.max(0,bal+runC));
+}
+function draw(){
+ const h=heat/100,hy=HY();
+ const r=Math.round(40+h*215),gg=Math.round(14+h*40*(1-h)),b=Math.round(70-h*55);
+ g.save();g.setTransform(DPR,0,0,DPR,0,0);
+ if(shake>0)g.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+ let bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,`rgb(${13+h*60|0},7,22)`);bg.addColorStop(.35,`rgb(${r},${gg},${b})`);bg.addColorStop(1,'#0d0716');
+ g.fillStyle=bg;g.fillRect(-20,-20,W+40,H+40);
+ // sun glow at horizon
+ const sg=g.createRadialGradient(W/2,hy,0,W/2,hy,W*.7);sg.addColorStop(0,`rgba(${255},${150-h*90|0},${120-h*90|0},${.35+h*.4})`);sg.addColorStop(1,'rgba(0,0,0,0)');
+ g.fillStyle=sg;g.fillRect(0,0,W,H);
+ // floor
+ g.fillStyle='rgba(10,4,20,.55)';g.fillRect(0,hy,W,H-hy);
+ g.lineWidth=1.5;
+ for(let i=-6;i<=6;i++){const a=proj(i/3,1),c=proj(i/3,-.1);g.strokeStyle=`rgba(${180+h*70|0},${130-h*80|0},255,${.28})`;g.beginPath();g.moveTo(a.x,a.y);g.lineTo(c.x,c.y+ (H-c.y)*.3);g.stroke()}
+ for(let i=0;i<14;i++){const d=((i/14)+(-scroll%1/14*1)+1)%1,p=proj(0,1-d*0);const f=Math.pow(1-(1-d),1.7);const y=hy+(PY()-hy)*Math.pow(d,1.7)*1.12;g.strokeStyle=`rgba(255,160,200,${.08+.25*d})`;g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}
+ drawBoards();
+ // items far -> near
+ const drawIt=it=>{const p=proj(it.wx,it.d),sz=Math.max(18,64*p.s*(W<500?.9:1.1));
+  g.globalAlpha=it.d<0?Math.max(0,1+it.d/.3):Math.min(1,(1-it.d)*5);
+  g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(p.x,p.y+sz*.45,sz*.45,sz*.14,0,0,6.3);g.fill();
+  const gl=it.v===1?'#ff3d2e':it.v===2?'#7fe3ff':'#ffe27a';g.shadowColor=gl;g.shadowBlur=14*p.s;
+  g.font=sz+'px serif';g.textAlign='center';g.textBaseline='middle';
+  g.save();g.translate(p.x,p.y-sz*.1);g.rotate(Math.sin(it.rot)*.22);g.fillText(it.e,0,0);g.restore();g.shadowBlur=0;
+  if(it.lab&&p.s>.3){g.font='700 '+Math.max(10,13*p.s*1.2)+'px sans-serif';g.fillStyle=it.v===1?'#ffb3a8':'#b8f0ff';g.fillText(it.lab,p.x,p.y-sz*.72)}g.globalAlpha=1};
+ items.filter(i=>i.d>=0).sort((a,b)=>b.d-a.d).forEach(drawIt);
+ // orb
+ const p=proj(px,0),R=Math.min(W,H)*.075+8,sq=h>.78;
+ g.fillStyle='rgba(0,0,0,.4)';g.beginPath();g.ellipse(p.x,p.y+R*1.05,R*.95,R*.28,0,0,6.3);g.fill();
+ const bob=Math.sin(performance.now()/180)*3;
+ const og=g.createRadialGradient(p.x-R*.3,p.y-R*.4+bob,R*.1,p.x,p.y+bob,R*1.9);
+ og.addColorStop(0,'#fff');const ca=skinCol(h,'a'),cb=skinCol(h,'b');og.addColorStop(.28,`rgb(${ca})`);og.addColorStop(.55,`rgba(${cb},.9)`);og.addColorStop(1,'rgba(255,80,60,0)');
+ g.fillStyle=og;g.beginPath();g.arc(p.x,p.y+bob,R*1.9,0,6.3);g.fill();
+ if(shield){g.strokeStyle='#7fd6ff';g.lineWidth=3;g.globalAlpha=.8;g.beginPath();g.arc(p.x,p.y+bob,R*1.25,0,6.3);g.stroke();g.globalAlpha=1}
+ g.fillStyle='#1a0b2b';const ey=p.y+bob-R*.1,ex=R*.34;
+ if(sq){g.fillRect(p.x-ex-R*.14,ey-2,R*.28,4);g.fillRect(p.x+ex-R*.14,ey-2,R*.28,4)}else{g.beginPath();g.ellipse(p.x-ex,ey,R*.1,R*.16,0,0,6.3);g.ellipse(p.x+ex,ey,R*.1,R*.16,0,0,6.3);g.fill()}
+ items.filter(i=>i.d<0).forEach(drawIt);
+ // particles
+ parts.forEach(q=>{g.globalAlpha=Math.max(0,q.l/.7);g.fillStyle=q.c;g.beginPath();g.arc(q.x,q.y,3.2,0,6.3);g.fill()});g.globalAlpha=1;
+ if(flash>0){g.fillStyle=`rgba(120,220,255,${flash*.35})`;g.fillRect(-20,-20,W+40,H+40)}
+ if(hitFlash>0){g.fillStyle=`rgba(255,40,20,${hitFlash*.7})`;g.fillRect(-20,-20,W+40,H+40)}
+ if(slow>0){g.strokeStyle='rgba(255,226,122,.5)';g.lineWidth=6;g.strokeRect(3,3,W-6,H-6)}
+ g.restore();
+}
+function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
+try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'||S==='event'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
+requestAnimationFrame(n=>{last=n;loop(n)});
+
+const SP=[['⏰','5:59 AM',"Alarm didn't ring",'You wake up 4 minutes before work.'],['🔋','7:10 AM','Phone at 1%','The charger is in the other bag.'],['🚦','8:45 AM','Stuck in traffic',"Boss: 'Where are you?' You: 'Almost there.'"],['💸','12:30 PM','Debit alert',"Salary is 'processing'. Rent is not."],['💬','3:15 PM','Seen',"Perfect message. Reply: 👍. Nothing else."],['📞','9:00 PM','Mum is calling',"'Have you eaten?' You say yes. You have not."],['📚','11:58 PM','Exam tomorrow',"'I'll start now.' *watches videos*"]];
+$('spcards').innerHTML=SP.map((c,i)=>`<div class="spc" style="--i:${i}"><div class="e">${c[0]}</div><div class="tm">${c[1]}</div><h3>${c[2]}</h3><p>${c[3]}</p></div>`).join('');
+let spl=false,spT=0,splGo=false,dispose3D=null;
+function endSplash(){if(!spl)return;spl=false;clearTimeout(spT);if(dispose3D)dispose3D();$('splash').classList.add('hide')}
+(function(){let rm=false;try{rm=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}if(rm)return;spl=true;$('splash').classList.remove('hide');$('splash').onclick=endSplash;loadThree()})();
+
+function goSplash(fb){if(!spl||splGo)return;splGo=true;const el=$('splash');el.classList.add('go');if(fb){el.classList.add('fb');el.classList.remove('d3')}spT=setTimeout(endSplash,12200);setTimeout(()=>{if(spl)buzz(80)},8900)}
+function loadThree(){let done=false;const fb=()=>{if(done)return;done=true;goSplash(true)},tm=setTimeout(fb,2500);
+const ok=()=>{if(done)return;clearTimeout(tm);done=true;try{start3D()}catch(e){console.error(e);splGo=false;clearTimeout(spT);goSplash(true)}};
+try{if(window.THREE)ok();else{const x=document.createElement('script');x.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';x.onload=ok;x.onerror=fb;document.head.appendChild(x)}}catch(e){fb()}}
+function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function wrapT(g,txt,x,y,w,lh){let l='';for(const wd of txt.split(' ')){const tt=l?l+' '+wd:wd;if(g.measureText(tt).width>w&&l){g.fillText(l,x,y);l=wd;y+=lh}else l=tt}g.fillText(l,x,y)}
+const EF='"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+function start3D(){
+const T=THREE,r=new T.WebGLRenderer({canvas:$('sp3d'),antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+const sc=new T.Scene(),cam=new T.PerspectiveCamera(62,1,.1,220);sc.add(cam);
+const C0=new T.Color(0x1a0a2e),C1=new T.Color(0x5a1008),RED=new T.Color(0xff3b2a),cc=new T.Color(),O0=new T.Color(0xcfb8ff),O1=new T.Color(0xff6a4a);
+sc.fog=new T.FogExp2(0x1a0a2e,.04);
+const rz=()=>{const w=innerWidth,h=innerHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<.8?78:62;cam.updateProjectionMatrix()};rz();addEventListener('resize',rz);
+const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
+const gc=mk(128,128),gg=gc.getContext('2d'),rg=gg.createRadialGradient(64,64,0,64,64,64);rg.addColorStop(0,'rgba(255,255,255,1)');rg.addColorStop(.4,'rgba(255,255,255,.35)');rg.addColorStop(1,'rgba(255,255,255,0)');gg.fillStyle=rg;gg.fillRect(0,0,128,128);const glowTex=new T.CanvasTexture(gc);
+const grid=new T.GridHelper(240,120,0xb58cff,0x6a3fd0);grid.position.set(0,-1.7,-70);grid.material.transparent=true;grid.material.opacity=.45;sc.add(grid);
+const NS=700,pos=new Float32Array(NS*3);for(let i=0;i<NS;i++){pos[i*3]=(Math.random()-.5)*60;pos[i*3+1]=-1.2+Math.random()*25;pos[i*3+2]=-110+Math.random()*122}
+const pg=new T.BufferGeometry();pg.setAttribute('position',new T.BufferAttribute(pos,3));sc.add(new T.Points(pg,new T.PointsMaterial({color:0xffffff,size:.14,transparent:true,opacity:.8})));
+const flo=[];['📚','💸','🔋','💬','📉','🧾','⏰','🚦'].forEach((em,k)=>{const c=mk(128,128),g=c.getContext('2d');g.font='96px '+EF;g.textAlign='center';g.textBaseline='middle';g.fillText(em,64,70);const tx=new T.CanvasTexture(c);
+for(let n=0;n<2;n++){const sp=new T.Sprite(new T.SpriteMaterial({map:tx,transparent:true,opacity:.9}));const y=-.6+Math.random()*6.5;sp.position.set((Math.random()<.5?-1:1)*(3+Math.random()*6),y,-3-Math.random()*72);sp.scale.set(1.2,1.2,1);sc.add(sp);flo.push({sp,y,p:Math.random()*6})}});
+const hues=['#ffb347','#ff6f6f','#ff9f43','#7fd6ff','#b58cff','#ff8fb1','#ff5a3d'],cards=[],pop=[],fired=[];
+SP.forEach((c,i)=>{const cv=mk(512,360),g=cv.getContext('2d'),gr=g.createLinearGradient(0,0,0,360);gr.addColorStop(0,'#2b1650');gr.addColorStop(1,'#14092a');
+rrect(g,6,6,500,348,34);g.fillStyle=gr;g.fill();g.lineWidth=5;g.strokeStyle=hues[i%7];g.stroke();g.textAlign='center';g.textBaseline='middle';
+g.font='96px '+EF;g.fillStyle='#fff';g.fillText(c[0],256,84);g.font='bold 30px monospace';g.fillStyle='#ffd75e';g.fillText(c[1],256,160);
+g.font='bold 44px sans-serif';g.fillStyle='#fff';g.fillText(c[2],256,212);g.font='26px sans-serif';g.fillStyle='#e2d4f5';wrapT(g,c[3],256,262,430,34);
+const tx=new T.CanvasTexture(cv),xd=(i%2?1:-1),z=-10*i-6,m=new T.Mesh(new T.PlaneGeometry(3.4,2.39),new T.MeshBasicMaterial({map:tx,transparent:true}));
+m.position.set(xd,.1,z);m.rotation.y=i%2?-.3:.3;sc.add(m);
+const gl=new T.Sprite(new T.SpriteMaterial({map:glowTex,color:new T.Color(hues[i%7]),blending:T.AdditiveBlending,transparent:true,opacity:.55,depthWrite:false}));gl.scale.set(7,5,1);gl.position.set(xd,.1,z-.2);sc.add(gl);
+cards.push({m,gl,i,x:xd,z});pop.push(0);fired.push(0)});
+const bbs=(CFG.sponsors||[]).filter(x=>x.kind==='billboard');
+if(bbs.length)for(let k=0;k<7;k++){if(Math.random()<.4)continue;const b=bbs[Math.floor(Math.random()*bbs.length)],cv=mk(512,256),g=cv.getContext('2d'),col=b.color||'#ff9f43',col2=b.color2||col;const bgr=g.createLinearGradient(0,0,512,256);bgr.addColorStop(0,'#2a0f4d');bgr.addColorStop(1,'#0e0420');g.fillStyle=bgr;g.beginPath();if(g.roundRect)g.roundRect(6,6,500,244,28);else g.rect(6,6,500,244);g.fill();const sg=g.createLinearGradient(0,0,512,0);sg.addColorStop(0,col);sg.addColorStop(1,col2);g.strokeStyle=sg;g.lineWidth=8;g.stroke();g.textAlign='center';g.fillStyle=sg;g.font='bold 62px sans-serif';g.fillText(b.name,256,128);g.fillStyle='#e8dcff';g.font='28px sans-serif';g.fillText(b.tag||'',256,176);g.fillStyle='#9d8cc0';g.font='bold 18px sans-serif';g.fillText('SPONSORED',256,222);
+const m=new T.Mesh(new T.PlaneGeometry(3.2,1.6),new T.MeshBasicMaterial({map:new T.CanvasTexture(cv),transparent:true})),sd=k%2?1:-1;m.position.set(sd*5.4,2.2,-4-k*10);m.rotation.y=sd*-.5;sc.add(m)}
+const orb=new T.Group();orb.position.set(0,-.66,-2.5);cam.add(orb);
+const bm=new T.MeshBasicMaterial({color:0xcfb8ff});orb.add(new T.Mesh(new T.SphereGeometry(.34,24,18),bm));
+const eg=new T.SphereGeometry(.05,10,8),em=new T.MeshBasicMaterial({color:0x1a0b2b}),e1=new T.Mesh(eg,em),e2=new T.Mesh(eg,em);e1.position.set(-.12,.05,.31);e2.position.set(.12,.05,.31);orb.add(e1,e2);
+const og=new T.Sprite(new T.SpriteMaterial({map:glowTex,color:0xb58cff,blending:T.AdditiveBlending,transparent:true,opacity:.85,depthWrite:false}));og.scale.set(2.4,2.4,1);og.position.z=-.1;orb.add(og);
+const ST=.6,SEG=1.15,TRV=.4,N=SP.length,END=ST+SEG*N,A=i=>ST+SEG*i+TRV;
+const W=[{t:0,z:cards[0].z+12,x:0,e:1}];for(let i=0;i<N;i++){const zd=cards[i].z+4.2,xd=cards[i].x*.55;W.push({t:A(i),z:zd,x:xd,e:0},{t:ST+SEG*(i+1),z:zd-.3,x:xd,e:1})}
+const lookV=new T.Vector3(cards[0].x,.1,cards[0].z),tgt=new T.Vector3();
+let raf=0,gone=false,dead=false,jolt=0,t0=performance.now(),lt=t0;
+function cleanup(){if(gone)return;gone=true;cancelAnimationFrame(raf);removeEventListener('resize',rz);try{r.dispose();r.forceContextLoss&&r.forceContextLoss()}catch(e){}}
+dispose3D=cleanup;
+function fail3D(e){try{console.error(e)}catch(_){}dead=true;cleanup();const el=$('splash');el.classList.remove('d3');el.classList.add('fb')}
+function frame(now){if(!spl||dead){cleanup();return}raf=requestAnimationFrame(frame);
+try{const t=(now-t0)/1000,dt=Math.min(.05,Math.max(0,(now-lt)/1000));lt=now;
+const s=Math.max(0,Math.min(1,(t-ST)/(SEG*N)));
+let k=0;while(k<W.length-2&&t>=W[k+1].t)k++;const a=W[k],b=W[k+1];let u=Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t)));if(a.e)u=u*u*(3-2*u);
+let cz=a.z+(b.z-a.z)*u,cx=a.x+(b.x-a.x)*u;const fin=Math.max(0,t-END);if(fin>0)cz=W[W.length-1].z+fin*1.4;
+for(let i=0;i<N;i++)if(!fired[i]&&t>=A(i)){fired[i]=1;jolt=1;pop[i]=1;buzz(25)}
+jolt*=Math.exp(-dt*8);const sh=jolt*.08+(fin>0?.14*Math.exp(-fin*2.5):0);
+cam.position.set(cx+(Math.random()-.5)*sh,.15+(Math.random()-.5)*sh,cz);
+const ci=Math.max(0,Math.min(N-1,Math.floor((t-ST+TRV*.5)/SEG)));tgt.set(cards[ci].x,.1,cards[ci].z);lookV.lerp(tgt,1-Math.exp(-dt*7));cam.lookAt(lookV);
+cc.copy(C0).lerp(C1,s);if(fin>0&&fin<.35)cc.lerp(RED,(1-fin/.35)*.8);r.setClearColor(cc,1);sc.fog.color.copy(cc);
+bm.color.copy(O0).lerp(O1,s);orb.position.y=-.66+Math.sin(t*3)*.03;orb.scale.setScalar(1+.25*jolt);e1.scale.y=e2.scale.y=Math.max(.2,1-.75*s);
+cards.forEach(c=>{pop[c.i]*=Math.exp(-dt*8);let z=1+.1*pop[c.i],op=1;if(fin>0){op=Math.max(0,1-fin/.7);c.m.rotation.z+=dt*(2+c.i*.6);z+=fin*2}c.m.scale.setScalar(z);c.m.material.opacity=op;c.gl.material.opacity=.55*op;c.m.visible=c.gl.visible=op>0});
+flo.forEach(f=>{f.sp.position.y=f.y+Math.sin(t*1.4+f.p)*.25});
+r.render(sc,cam)}catch(e){fail3D(e)}}
+$('splash').classList.add('d3');goSplash(false);raf=requestAnimationFrame(frame)}
+function bankRun(){const r=Math.floor(runC);runC=0;if(!r)return;bal=Math.max(0,bal+r);sv('cooked_bal',bal);tot+=Math.max(0,r);sv('cooked_tot',tot)}
+function pauseGame(){if(S!=='play')return;S='paused';for(const k in keys)keys[k]=0;$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
+const IP='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>',IR='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',IM='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Game paused</p><h2 style="margin:4px 0 2px">Level ${lvl+1}</h2><p class="small" style="margin:0 0 10px">${LVL(lvl).name}</p><div class="ostats"><div><b>${t.toFixed(1)}s</b><span>Time</span></div><div><b>${Math.round(heat)}%</b><span>Stress</span></div><div><b>${fmt(runC)}</b><span>Coins</span></div></div><button class="play ib" id="rs">${IP}Resume</button><div class="grid"><button class="alt ib" id="rr">${IR}Restart</button><button class="alt ib" id="rq">${IM}Menu</button></div><p class="small">Restarting or leaving keeps the coins you have earned so far.</p>`;
+$('rs').onclick=resume;$('rr').onclick=()=>{bankRun();$('ov').style.background='';beginRun()};$('rq').onclick=()=>{bankRun();$('ov').style.background='';S='menu';$('hud').classList.add('hide');menu()}}
+let cdT=0,cdN=0;
+function resume(){if(S!=='paused')return;$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=3;cdN=0}
+function cdStep(dt){cdT-=dt;const n=Math.ceil(cdT);if(n!==cdN&&n>0){cdN=n;say(String(n))}if(cdT<=0){S='play';say('Go!')}}
+$('pause').onclick=pauseGame;
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame()});
+
+let wpOpen=false,wpDoc=null;
+const wEsc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function wpChart(b){const f=x=>x>=1e6?(x/1e6).toFixed(x%1e6?1:0)+'M':Math.round(x).toLocaleString('en-US');
+if(b.kind==='alloc'){const d=b.data,C=2*Math.PI*45,seg=[[d.players,'#7fd6ff','Players and community'],[d.investors,'#ffb347','Investors'],[d.developer,'#ff6f6f','Developer']];let off=0;
+const rings=seg.map(([v,c])=>{const L=C*v/100,o=off;off+=L;return `<circle r="45" cx="60" cy="60" fill="none" stroke="${c}" stroke-width="22" stroke-dasharray="${L} ${C-L}" stroke-dashoffset="${-o}" transform="rotate(-90 60 60)"/>`}).join('');
+return `<div class="wch"><svg viewBox="0 0 120 120" width="190" height="190" role="img" aria-label="Allocation chart">${rings}<text x="60" y="58" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">${f(wpDoc.model.S)}</text><text x="60" y="72" text-anchor="middle" fill="#b9a7cf" font-size="8">total supply</text></svg><div class="wleg">${seg.map(([v,c,n])=>`<span><i style="background:${c}"></i>${n} ${v}%</span>`).join('')}</div></div>`}
+if(b.kind==='emission'){const mx=Math.max(...b.data);return `<div class="wch"><div class="wbars">${b.data.map((v,i)=>`<div><span>${f(v)}</span><b style="height:${Math.round(v/mx*110)}px"></b><span>Year ${i+1}</span></div>`).join('')}</div></div>`}
+if(b.kind==='circ'){const pts=b.data.pts,X=x=>30+x/60*260,Y=y=>115-y*1.05,line=pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ');
+const grid=[0,25,50,75,100].map(y=>`<line x1="30" x2="290" y1="${Y(y)}" y2="${Y(y)}" stroke="rgba(255,255,255,.12)"/><text x="26" y="${Y(y)+3}" text-anchor="end" fill="#b9a7cf" font-size="8">${y}%</text>`).join('');
+const xs=[0,12,24,36,48,60].map(x=>`<text x="${X(x)}" y="130" text-anchor="middle" fill="#b9a7cf" font-size="8">${x}</text>`).join('');
+return `<div class="wch"><svg viewBox="0 0 300 140" width="100%" role="img" aria-label="Circulating supply chart">${grid}${xs}<polygon points="${X(0)},${Y(0)} ${line} ${X(60)},${Y(0)}" fill="rgba(143,92,255,.25)"/><polyline points="${line}" fill="none" stroke="#ffb347" stroke-width="2"/></svg><div class="wleg"><span>Months after launch</span></div></div>`}return ''}
+function wpBlock(b){if(b.t==='p')return `<p>${wEsc(b.x)}</p>`;if(b.t==='h3')return `<h3>${wEsc(b.x)}</h3>`;
+if(b.t==='ul')return `<ul>${b.items.map(i=>`<li>${wEsc(i)}</li>`).join('')}</ul>`;
+if(b.t==='note')return `<div class="wn ${b.kind}">${wEsc(b.x)}</div>`;
+if(b.t==='kv')return `<dl class="wkv">${b.rows.map(r=>`<div><dt>${wEsc(r[0])}</dt><dd>${wEsc(r[1])}</dd></div>`).join('')}</dl>`;
+if(b.t==='table')return `<div class="wt"><table><thead><tr>${b.head.map(h=>`<th>${wEsc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map(r=>`<tr class="${/^(Total|Subtotal)$/.test(r[0])?'tot':''}">${r.map(c=>`<td>${wEsc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+if(b.t==='chart')return wpChart(b);return ''}
+function openWP(id){if(!wpDoc){wpDoc=buildWhitepaper(CFG);
+$('wpn').innerHTML=wpDoc.sections.map(x=>`<button class="alt" data-s="${x.id}">${wEsc(x.title)}</button>`).join('');
+$('wpc').innerHTML=`<div class="cover"><h1>${wEsc(wpDoc.title)}</h1><p>${wEsc(wpDoc.subtitle)}</p></div>`+wpDoc.sections.map(x=>`<section id="wps-${x.id}"><h2>${wEsc(x.title)}</h2>${x.blocks.map(wpBlock).join('')}</section>`).join('')+`<p class="small" style="text-align:center">End of whitepaper v${wEsc(wpDoc.version)}.</p>`;
+$('wpn').onclick=e=>{const b=e.target.closest&&e.target.closest('button');if(!b)return;const el=document.getElementById('wps-'+b.dataset.s);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})};
+$('wp').onscroll=()=>{const el=$('wp'),h=el.scrollHeight-el.clientHeight;$('wpp').style.width=(h>0?el.scrollTop/h*100:0)+'%'};
+$('wpb').onclick=closeWP}
+wpOpen=true;$('wp').classList.remove('hide');$('wp').scrollTop=0;
+if(id)setTimeout(()=>{const el=document.getElementById('wps-'+id);if(el)el.scrollIntoView()},40)}
+function closeWP(){wpOpen=false;$('wp').classList.add('hide')}
+</script></body></html>
