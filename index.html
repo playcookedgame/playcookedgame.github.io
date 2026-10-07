@@ -197,7 +197,7 @@ const CFG={
  rewards:{free:500,levelUp:50},
  adCooldownMs:3600000, // 1 hour between reward ads
  adDailyMax:4, // reward ads per day, resets at local midnight
- levels:{base:5000,step:15000,power:1.6}, // total coins needed per level. Level 1 = the 5,000 starter coins
+ levels:{base:5000,step:15000,power:1.6}, // balance needed per level. Level 1 = the 5,000 starter coins
  earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
  site:'https://playcookedgame.github.io/', // your domain once you own it, for example https://cooked.app (used in share links)
  token:{name:'Cooked',symbol:'COOKED',supply:750000000,players:60,investors:30,developer:10,version:'0.1',date:'October 2026'},
@@ -331,7 +331,7 @@ function buildWhitepaper(CFG) {
   sec('game', 'The game', [
     P('You are a glowing orb. Life problems fall toward you. Drag to dodge them and catch the things that cool you down. Your stress bar rises on its own and with every hit. At 100% you are cooked.'),
     UL([
-      'Endless levels, unlocked by total coins. Level 1 starts at the 5,000 starter coins and every next level needs more total coins than the last. Student life, Job hunt, Adulting, Family & love, Parenting, Career climb, Building a home, Caring for parents, Planning ahead, then Life, Chapter 1, 2, 3 and so on forever.',
+      'Endless levels, unlocked by the coins in your balance. Level 1 starts at the 5,000 starter coins and every next level needs a bigger balance than the last. Student life, Job hunt, Adulting, Family & love, Parenting, Career climb, Building a home, Caring for parents, Planning ahead, then Life, Chapter 1, 2, 3 and so on forever.',
       'Problems with weight. More than 70 everyday problems, each with a severity. Rent and hospital bills hurt more than a weak network.',
       'Cooling items and power-ups. Coffee, a nap, a song, a friend\'s call. A shield blocks one hit. Slow motion slows time.',
       'Life events. About once a minute you face a real decision with a trade-off: lend money to a friend, accept overtime, take a day off.',
@@ -360,10 +360,10 @@ function buildWhitepaper(CFG) {
     ] },
     H('Starter coins'),
     P('New players start with ' + n(CFG.starterCoins) + ' coins. Starter coins are locked and cannot be sent to other players, so nobody can create many accounts to collect free coins.'),
-    H('Levels and total coins'),
-    P('Your level comes from your total coins: the ' + n(CFG.starterCoins) + ' starter coins plus everything you earn. Level 1 starts at the starter coins, and every new level needs more total coins than the one before, so each step is harder than the last. Coins are earned slowly on purpose, by surviving, dodging problems and catching cooling items, and every problem you hit takes coins off your balance. Neither hits nor spending in the shop ever lowers your level.'),
-    { t: 'table', head: ['Level', 'Stage', 'Total coins needed'], rows: levelRows },
-    P('After that the stages continue as Life, Chapter 2, 3 and so on, each one needing more total coins than the last, with no finish line.'),
+    H('Levels and your balance'),
+    P('Your level comes from the coins you are holding right now: the ' + n(CFG.starterCoins) + ' starter coins plus whatever you have earned and not spent. Level 1 starts at the starter coins, and every new level needs a bigger balance than the one before, so each step is harder than the last. Coins are earned slowly on purpose, by surviving, dodging problems and catching cooling items, and every problem you hit takes coins off your balance. Coins you spend in the shop or lose to hits no longer count, so your level can go down if your balance drops.'),
+    { t: 'table', head: ['Level', 'Stage', 'Balance needed'], rows: levelRows },
+    P('After that the stages continue as Life, Chapter 2, 3 and so on, each one needing a bigger balance than the last, with no finish line.'),
   ]);
 
   sec('earn', 'How players earn ' + sym, [
@@ -569,7 +569,7 @@ const HY=()=>H*.3,PY=()=>H*.8;
 function proj(wx,d){const f=Math.pow(Math.max(1-d,0),1.7);return{x:W/2+wx*W*.5*(.1+.9*f),y:HY()+(PY()-HY())*f,s:.1+.9*f,f}}
 function spawn(wx,kind){items.push({wx,d:1,kind,e:kind.e,v:kind.v||0,cool:kind.cool||0,sev:kind.sev||0,lab:kind.lab||'',rot:Math.random()*6})}
 function startGame(){if(ld('cooked_intro',0))beginRun();else intro()}
-function beginRun(){S='play';lvl=lvlOf(tot);runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
+function beginRun(){S='play';lvl=lvlOf(bal);runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
 $('ov').classList.add('hide');$('hud').classList.remove('hide');$('pause').classList.remove('hide');say('Level 1: Student life')}
 function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*220;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,l:.7,c:col})}}
 const LV=[
@@ -599,8 +599,8 @@ function end(){const fails=ld('cooked_fails',0)+1;sv('cooked_fails',fails);S='ov
 if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl);const raw=Math.floor(runC),net=raw,earn=Math.max(0,raw+Math.floor(loss)),done=checkCh(sc),bonus=done.reduce((a,c)=>a+c.rew,0);bal=Math.max(0,bal+net+bonus);sv('cooked_bal',bal);tot+=Math.max(0,net)+bonus;sv('cooked_tot',tot);
 $('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails})}
 function showOver(r){const V=LVL(r.L);
-const lo=thr(r.L),hi=thr(r.L+1),pg=Math.max(0,Math.min(100,Math.round((tot-lo)/(hi-lo)*100))),more=r.n<2;
-$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(r.L+1).icon} ${LVL(r.L+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(tot)} / ${fmt(hi)} total coins</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double coins</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
+const cl=lvlOf(bal),lo=thr(cl),hi=thr(cl+1),pg=Math.max(0,Math.min(100,Math.round((bal-lo)/(hi-lo)*100))),more=r.n<2;
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(cl+1).icon} ${LVL(cl+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(bal)} / ${fmt(hi)} coins</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double coins</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
 r._p=cardBlob(r);$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
 $('share').onclick=()=>shareCard(r)}
 function wallet(back=menu){
@@ -629,7 +629,7 @@ function howto(){$('card').innerHTML=`<h2>❓ How to play</h2>
 <div class="leg bad"><b>Dodge</b><span>📚 💸 🔋 💬 ⏰</span><small>Life problems add stress and cost coins. Big ones like 💸 and 🏥 cost the most.</small></div>
 <div class="leg good"><b>Catch</b><span>☕ 😴 🧊 🎧 🍕 🫂</span><small>Cool you down. Chain 4 for a bonus.</small></div>
 <div class="leg pw"><b>Power-ups</b><span>🛡️ ⏳</span><small>Block a hit, or slow time</small></div>
-<p class="how">Drag left and right, or use the arrow keys. You earn coins every second, and every problem that hits you takes coins off your balance. The total coins you earn set your level, and every level needs more than the last.</p><button id="wi">▶ Watch intro</button><button class="alt" id="bk">Back</button>`;$('bk').onclick=menu;$('wi').onclick=intro}
+<p class="how">Drag left and right, or use the arrow keys. You earn coins every second, and every problem that hits you takes coins off your balance. Your level follows the coins in your balance, so spending or losing coins can lower it, and every level needs more than the last.</p><button id="wi">▶ Watch intro</button><button class="alt" id="bk">Back</button>`;$('bk').onclick=menu;$('wi').onclick=intro}
 function airdrop(){const hasSol=!!ld('cooked_sol','');
 $('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision for the next 6 months: take Cooked from a browser game to a live token on Solana, with the players who got us there first in line.</p>
 <h3 class="ah">The 6-month plan</h3>
@@ -641,7 +641,7 @@ $('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision fo
 <p class="small">Airdrop allocations come from the community campaigns share of the supply and are based on verified play. Goals and dates can change as we build, and we will announce updates in the game.</p>
 <button class="play" id="adw">${hasSol?'Update my Solana address':'Submit my Solana address'}</button><button class="alt" id="bk">Back</button>`;
 $('bk').onclick=menu;$('adw').onclick=()=>wallet(airdrop)}
-function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(tot)+1}: ${LVL(lvlOf(tot)).name} · ${fmt(tot)} / ${fmt(thr(lvlOf(tot)+1))} total coins</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your coins.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of coins? Play a run or watch an ad in the shop to earn more.</p>':''}`;
+function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(bal)+1}: ${LVL(lvlOf(bal)).name} · ${fmt(bal)} / ${fmt(thr(lvlOf(bal)+1))} coins for Level ${lvlOf(bal)+2}</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your coins.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of coins? Play a run or watch an ad in the shop to earn more.</p>':''}`;
 $('go').onclick=startGame;$('mc').onclick=challenges;$('ma').onclick=airdrop;$('mw').onclick=()=>wallet(menu);$('mh').onclick=howto;$('ms').onclick=()=>shop(menu);$('mm').onclick=toggleMute;$('mp').onclick=()=>openWP();$('mtk').onclick=()=>openWP('tokenomics')}
 
 const CAP=[[0,'COOKED','Survive real life.',1],[1.6,'This is you','A calm little orb. Keep your stress low.'],[3.4,'Life throws problems at you','Exams, low battery, no reply. Dodge them.'],[6.4,'Get hit and it costs you','Stress goes up and coins drop. Big problems cost more.'],[9.2,'Small joys cool you down','Coffee, rest, music. Catch them to calm down.'],[12.2,'Level up through real life','Student, job, family and beyond. It never ends.'],[14.8,'How long can you stay cool?','Drag left and right to move.']];
@@ -753,7 +753,7 @@ function upd(dt){
  if(keys.ArrowLeft)tx=Math.max(-1,tx-dt*2.2);if(keys.ArrowRight)tx=Math.min(1,tx+dt*2.2);
  px+=(tx-px)*Math.min(1,dt*14);
  const sp=slow>0?.5:1;slow=Math.max(0,slow-dt);
- t+=dt;peakC=Math.max(peakC,runC);const nl=lvlOf(tot+peakC);if(nl>lvl){lvl=nl;heat=Math.max(0,heat-12);runC+=lvl*CFG.rewards.levelUp;say('Level '+(lvl+1)+': '+LVL(lvl).name+'  +'+fmt(lvl*CFG.rewards.levelUp)+' <i class=cc></i>');flash=.3;buzz(30);sfx('lvl')}const D=diff();runC+=dt*CFG.earn.perSec*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1)*skM();dblT=Math.max(0,dblT-dt);fastT=Math.max(0,fastT-dt);
+ t+=dt;peakC=Math.max(peakC,runC);const nl=lvlOf(bal+peakC);if(nl>lvl){lvl=nl;heat=Math.max(0,heat-12);runC+=lvl*CFG.rewards.levelUp;say('Level '+(lvl+1)+': '+LVL(lvl).name+'  +'+fmt(lvl*CFG.rewards.levelUp)+' <i class=cc></i>');flash=.3;buzz(30);sfx('lvl')}const D=diff();runC+=dt*CFG.earn.perSec*(1+CFG.earn.levelBoost*lvl)*(dblT>0?2:1)*(hustle?1.5:1)*skM();dblT=Math.max(0,dblT-dt);fastT=Math.max(0,fastT-dt);
  heat+=dt*(.9+D*.5);
  scroll+=dt*sp*D*.9;
  spawnT-=dt*sp;
