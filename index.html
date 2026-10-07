@@ -548,7 +548,7 @@ try{best=+localStorage.getItem('cooked_best')||0}catch(e){}
 const $=id=>document.getElementById(id),keys={};
 function buzz(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
 function say(s){const m=$('msg');m.innerHTML=s;m.style.opacity=1;clearTimeout(say.k);say.k=setTimeout(()=>m.style.opacity=0,900)}
-function diff(){return 1+1.6*(1-Math.exp(-t/150))}
+function diff(){return 1+.6*(1-Math.exp(-t/200))}
 const HY=()=>H*.3,PY=()=>H*.8;
 function proj(wx,d){const f=Math.pow(Math.max(1-d,0),1.7);return{x:W/2+wx*W*.5*(.1+.9*f),y:HY()+(PY()-HY())*f,s:.1+.9*f,f}}
 function spawn(wx,kind){items.push({wx,d:1,kind,e:kind.e,v:kind.v||0,cool:kind.cool||0,sev:kind.sev||0,lab:kind.lab||'',rot:Math.random()*6})}
@@ -741,13 +741,13 @@ function upd(dt){
  heat+=dt*(.9+D*.5);
  scroll+=dt*sp*D*.9;
  spawnT-=dt*sp;
- if(spawnT<=0){spawnT=Math.max(.32,.85-t/400)*(.8+Math.random()*.4)*(fastT>0?.7:1);
+ if(spawnT<=0){spawnT=Math.max(.55,.95-t/500)*(.8+Math.random()*.4)*(fastT>0?.7:1);
   const r=Math.random(),wx=Math.random()*1.7-.85;
   if(r<.62){const pl=LVL(lvl).bad.concat(lvl?LVL(lvl-1).bad:[]);const b=pl[Math.random()*pl.length|0];spawn(wx,{e:b[0],lab:b[1],v:1,sev:SEV[b[0]]||2})}
   else if(r<.9){const c=COOL[Math.random()*COOL.length|0];spawn(wx,{e:c[0],lab:c[2],v:2,cool:c[1]})}
   else spawn(wx,Math.random()<.5?{e:'🛡️',v:3}:{e:'⏳',v:4})}
  waveT-=dt;if(waveT<=0){waveT=20;const gap=Math.random()*5|0;say('Deadline wave!');buzz(40);for(let i=0;i<5;i++)if(i!==gap)spawn(-.8+i*.4,{e:'⏰',lab:'Deadline',v:1,sev:3})}
- const v=(.42+.22*D)*sp;
+ const v=(.36+.15*D)*sp;
  for(const it of items){it.d-=v*dt;it.rot+=dt*2}
  for(const it of items){if(it.d<.07&&it.d>-.08&&!it.done&&Math.abs(it.wx-px)<.19){it.done=1;
    const p=proj(px,0);
