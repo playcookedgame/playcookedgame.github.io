@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="monetag" content="eeb42386b51f151d9582bdf6c1e9acae">
+<meta name="description" content="Survive real life. Dodge problems, stay calm and see how long you can last.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Cooked">
+<meta property="og:title" content="Cooked - Survive real life">
+<meta property="og:description" content="Think you can beat my score? Play now, no download needed.">
+<meta property="og:url" content="https://playcookedgame.github.io/">
+<meta property="og:image" content="https://playcookedgame.github.io/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://playcookedgame.github.io/og-image.png">
 <script>
 /* Cloud save (Supabase). Paste your Project URL and publishable/anon key below. */
 (function(){
@@ -170,7 +177,7 @@ const CFG={
  rewards:{free:100,levelUp:50},
  levels:{base:5000,step:15000,power:1.6}, // total coins needed per level. Level 1 = the 5,000 starter coins
  earn:{perSec:.15,dodge:.5,catch:1.5,combo:.5,levelBoost:.15}, // coins: per second survived, per problem dodged, per cooling item caught (+combo bonus). levelBoost = small rise per level
- site:'', // your domain once you own it, for example https://cooked.app (used in share links)
+ site:'https://playcookedgame.github.io/', // your domain once you own it, for example https://cooked.app (used in share links)
  token:{name:'Cooked',symbol:'COOKED',supply:750000000,players:60,investors:30,developer:10,version:'0.1',date:'October 2026'},
  adUrl:'https://hai8g.com/4/11977354', // PASTE YOUR AD LINK HERE (https://...). It loads inside the ad box in the game.
  adSeconds:30, // how long players must watch before they can continue
@@ -572,9 +579,8 @@ $('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classLis
 function showOver(r){const V=LVL(r.L);
 const lo=thr(r.L),hi=thr(r.L+1),pg=Math.max(0,Math.min(100,Math.round((tot-lo)/(hi-lo)*100))),more=r.n<2;
 $('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(r.L+1).icon} ${LVL(r.L+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(tot)} / ${fmt(hi)} total coins</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double coins</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
-$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
-$('share').onclick=()=>{const m=`I reached Level ${r.L+1} (${V.title}) in Cooked: ${r.sc.toFixed(1)}s and ${fmt(bal)} Cooked Coins. Beat that:`,u=CFG.site||location.href;
-if(navigator.share)navigator.share({text:m,url:u}).catch(()=>{});else try{navigator.clipboard.writeText(m+' '+u);$('share').textContent='Copied'}catch(e){}}}
+r._p=cardBlob(r);$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
+$('share').onclick=()=>shareCard(r)}
 function wallet(back=menu){
 let sol=ld('cooked_sol','');
 $('card').innerHTML=`<h1><i class=cc></i> Wallet</h1><p class="small">Your Cooked Coins</p><div class="big" id="bal" style="font-size:38px">${fmt(bal)}</div><p class="small">Total earned so far: ${fmt(tot)} <i class=cc></i></p><p class="small">These are your cooked coins. They are in-game points with no cash value yet. The $COOKED token is not live yet, so keep playing and keep stacking them.</p><p>Submit your Solana (SOL) address</p><p class="small">Add the wallet address you want linked to your coins so you are on the list when $COOKED launches. Never share a seed phrase or private key. We only ever need the public address.</p><input id="sol" placeholder="Your Solana address" autocomplete="off" autocapitalize="off" spellcheck="false" value="${sol}"><button id="solsv">${sol?'Update address':'Submit address'}</button><div id="res"></div><button class="alt" id="bk">Back</button>`;
@@ -703,14 +709,18 @@ g.fillStyle='#e8dcff';g.font=Math.max(6,9*p.s)+'px sans-serif';g.fillText(b.tag|
 const pw=46*p.s,ph=11*p.s;bbRR(g,x0+6*p.s,y0+5*p.s,pw,ph,ph/2);g.fillStyle='rgba(255,255,255,.14)';g.fill();
 g.fillStyle='#cdbdf0';g.font='700 '+Math.max(4,6.5*p.s)+'px sans-serif';g.textAlign='left';g.fillText('SPONSORED',x0+10*p.s,y0+5*p.s+ph/2);g.textAlign='center'}
 g.globalAlpha=1}
-function shareCard(r){const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),V=LVL(r.L),gr=x.createLinearGradient(0,0,0,1350);gr.addColorStop(0,'#2b1650');gr.addColorStop(1,'#5a1008');x.fillStyle=gr;x.fillRect(0,0,1080,1350);x.textAlign='center';
+function cardBlob(r){return new Promise(res=>{const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),V=LVL(r.L),gr=x.createLinearGradient(0,0,0,1350);gr.addColorStop(0,'#2b1650');gr.addColorStop(1,'#5a1008');x.fillStyle=gr;x.fillRect(0,0,1080,1350);x.textAlign='center';
 const T=(t,y,f,col)=>{x.font=f;x.fillStyle=col;x.fillText(t,540,y)};
 T('COOKED',170,'bold 120px sans-serif','#fff');T('Survive real life',245,'60px sans-serif','#d8c8ee');T(V.icon,560,'260px '+EF,'#fff');T(V.title,700,'bold 76px sans-serif','#ffd75e');
 T('Level '+(r.L+1)+': '+V.name,790,'52px sans-serif','#fff');T(r.sc.toFixed(1)+'s',960,'bold 130px sans-serif','#fff');
 T((r.net>=0?'+':'')+fmt(r.net)+' Cooked Coins',1050,'56px sans-serif',r.net>=0?'#8fffa8':'#ff9f8f');T('Lost '+fmt(r.loss)+' to life problems',1120,'44px sans-serif','#d8c8ee');T('Can you beat this?',1260,'bold 52px sans-serif','#ff9f43');
-c.toBlob(async b=>{if(!b)return;const f=new File([b],'cooked.png',{type:'image/png'});
-try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'Can you beat this? '+(CFG.site||location.href)});return}}catch(e){}
-try{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='cooked.png';a.click()}catch(e){}},'image/png')}
+c.toBlob(b=>res(b),'image/png')})}
+function shareText(r){const V=LVL(r.L);return '🔥 I got COOKED!\n'+V.icon+' Level '+(r.L+1)+': '+V.title+'\n⏱️ '+r.sc.toFixed(1)+'s  ·  💰 '+fmt(bal)+' Cooked Coins\n\nThink you can beat me? 👇\n'+(CFG.site||location.href)}
+async function shareCard(r){const text=shareText(r);let b=null;try{b=await(r._p||cardBlob(r))}catch(e){}
+const f=b?new File([b],'cooked.png',{type:'image/png'}):null;
+try{if(f&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}if(navigator.share){await navigator.share({text});return}}
+catch(e){if(e&&e.name==='AbortError')return;try{if(navigator.share){await navigator.share({text});return}}catch(e2){if(e2&&e2.name==='AbortError')return}}
+try{await navigator.clipboard.writeText(text);say('Copied! Paste it in WhatsApp')}catch(e){say('Sharing is not supported here')}}
 
 menu();
 function setX(cx){tx=Math.max(-1,Math.min(1,(cx/W*2-1)/.92))}
