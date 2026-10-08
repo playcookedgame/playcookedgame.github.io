@@ -927,19 +927,25 @@ $('wpb').onclick=closeWP}
 wpOpen=true;$('wp').classList.remove('hide');$('wp').scrollTop=0;
 if(id)setTimeout(()=>{const el=document.getElementById('wps-'+id);if(el)el.scrollIntoView()},40)}
 function closeWP(){wpOpen=false;$('wp').classList.add('hide')}
-</script><div id="instp" role="dialog" aria-label="Install Cooked"><img src="icon-192.png" alt="" width="46" height="46"><div class="tx"><b>Install Cooked</b><span id="instt">Play full-screen, anytime</span></div><button id="instb">Install</button><button class="x" id="instx" aria-label="Dismiss">✕</button></div>
+</script><div id="instp" role="dialog" aria-label="Install Cooked"><img src="icon-192.png" alt="" width="46" height="46"><div class="tx"><b id="insth">Install Cooked</b><span id="instt">Play full-screen, anytime</span></div><button id="instb">Install</button><button class="x" id="instx" aria-label="Dismiss">✕</button></div>
 <script>
 (function(){
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
 var standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 var dis=function(){try{return localStorage.getItem('cooked_inst_x')}catch(e){return null}};
 var p=document.getElementById('instp'),b=document.getElementById('instb'),t=document.getElementById('instt'),x=document.getElementById('instx'),ev=null;
-if(standalone||!p)return;
+var ua=navigator.userAgent,APK='https://github.com/playcookedgame/playcookedgame.github.io/releases/latest/download/Cooked.apk';
+var inApp=/[?&]source=app/.test(location.search)||/; wv\)/.test(ua);
+try{if(inApp)localStorage.setItem('cooked_in_app','1');else if(localStorage.getItem('cooked_in_app'))inApp=true}catch(e){}
+if(standalone||inApp||!p)return;
+var android=/android/i.test(ua);
 var show=function(){if(!dis())setTimeout(function(){p.classList.add('on')},4000)};
 x.onclick=function(){p.classList.remove('on');try{localStorage.setItem('cooked_inst_x',String(Date.now()))}catch(e){}};
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;show()});
+if(android){document.getElementById('insth').textContent='Get the app';t.textContent='Free Android app, full screen';b.textContent='Download';
+b.onclick=function(){b.textContent='Starting...';x.onclick();location.href=APK;setTimeout(function(){b.textContent='Download'},3000)};show()}
+else{window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;show()});
 window.addEventListener('appinstalled',function(){p.classList.remove('on');ev=null});
-b.onclick=function(){if(!ev)return;ev.prompt();ev.userChoice.then(function(){p.classList.remove('on');ev=null})};
+b.onclick=function(){if(!ev)return;ev.prompt();ev.userChoice.then(function(){p.classList.remove('on');ev=null})}}
 var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!/crios|fxios/i.test(navigator.userAgent);
 if(ios){t.textContent='Tap Share, then Add to Home Screen';b.style.display='none';show()}
 })();
