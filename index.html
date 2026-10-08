@@ -184,6 +184,14 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 #instp #instb{padding:11px 18px;background:#ff6a3d;color:#fff}
 #instp button.x{width:32px;height:32px;padding:0;background:rgba(255,255,255,.08);color:#b9a7cf;font-size:14px;border-radius:50%}
 @media (prefers-reduced-motion:reduce){#instp,#instp.on{transition:none}}
+.strk{margin:10px 0 4px;padding:9px 12px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.strh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-weight:800}.strh span{color:#ffcf6b;font-weight:700;font-size:12px}
+.strh button{margin:0;min-height:0;width:auto;padding:7px 14px;border-radius:99px;font-size:13px;flex-direction:row}
+.strd{display:flex;gap:5px;margin-top:8px}.strd i{flex:1;height:7px;border-radius:9px;background:rgba(255,255,255,.12)}.strd i.d{background:linear-gradient(90deg,#ff6a3d,#ffb347)}.strd i.n{background:#fff;opacity:.85}
+.chb{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 4px;padding:9px 12px;border-radius:16px;background:rgba(20,241,149,.1);border:1px solid rgba(20,241,149,.35);text-align:left;font-size:13px}.chb b{display:block;font-size:14px}.chb span{color:#b9f5dc}
+.chb #chx{margin:0!important;min-height:0!important;width:34px!important;min-width:34px!important;height:34px!important;padding:0!important;border-radius:50%!important;flex:none!important;flex-direction:row;font-size:14px}
+.shp{margin:10px 0;padding:12px;border-radius:14px;background:rgba(255,255,255,.06);font-size:14px;line-height:1.4;word-break:break-word;text-align:left}.shp span{color:#9bd;font-size:12px}
+a.lk{color:#9bd;text-decoration:underline;cursor:pointer}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="hud" class="hide"><div id="bar"><div id="fill"></div></div><div id="row"><span id="t">0.0s</span><span id="st"></span><span id="heat">0%</span></div></div>
@@ -569,7 +577,7 @@ const HY=()=>H*.3,PY=()=>H*.8;
 function proj(wx,d){const f=Math.pow(Math.max(1-d,0),1.7);return{x:W/2+wx*W*.5*(.1+.9*f),y:HY()+(PY()-HY())*f,s:.1+.9*f,f}}
 function spawn(wx,kind){items.push({wx,d:1,kind,e:kind.e,v:kind.v||0,cool:kind.cool||0,sev:kind.sev||0,lab:kind.lab||'',rot:Math.random()*6})}
 function startGame(){if(ld('cooked_intro',0))beginRun();else intro()}
-function beginRun(){S='play';lvl=lvlOf(bal);bestAtStart=best;lastRec=0;runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
+function beginRun(){S='play';lvl=lvlOf(bal);bestAtStart=best;lastRec=0;if(chal){chal.hit=0;say('🎯 Beat '+chal.t.toFixed(1)+'s')}runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
 $('ov').classList.add('hide');$('hud').classList.remove('hide');$('pause').classList.remove('hide');say('Level 1: Student life')}
 function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*220;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,l:.7,c:col})}}
 const LV=[
@@ -597,12 +605,13 @@ if(!myId){const a=new Uint16Array(2);(window.crypto||{getRandomValues(x){x[0]=Ma
 function cpy(x,b){try{navigator.clipboard.writeText(x).then(()=>b.textContent='Copied',()=>b.textContent='Select and copy')}catch(e){b.textContent='Select and copy'}}
 function end(){const fails=ld('cooked_fails',0)+1;sv('cooked_fails',fails);S='over';buzz([60,40,120]);sfx('over');const sc=+t.toFixed(1);let nb=sc>bestAtStart;if(sc>best){best=sc;try{localStorage.setItem('cooked_best',best)}catch(e){}}
 if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl);const raw=Math.floor(runC),net=raw,earn=Math.max(0,raw+Math.floor(loss)),done=checkCh(sc),bonus=done.reduce((a,c)=>a+c.rew,0);bal=Math.max(0,bal+net+bonus);sv('cooked_bal',bal);tot+=Math.max(0,net)+bonus;sv('cooked_tot',tot);
-$('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails})}
+$('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');let ch=null;if(chal){ch={t:chal.t,beat:sc>=chal.t};if(ch.beat)chalClear()}
+showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails,ch})}
 function showOver(r){const V=LVL(r.L);
 const cl=lvlOf(bal),lo=thr(cl),hi=thr(cl+1),pg=Math.max(0,Math.min(100,Math.round((bal-lo)/(hi-lo)*100))),more=r.n<2;
-$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(cl+1).icon} ${LVL(cl+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(bal)} / ${fmt(hi)} $COOKED</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double $COOKED</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p>${r.ch?`<p class="small" style="margin:6px 0 0;font-weight:700;color:${r.ch.beat?'#7dffb0':'#ffb347'}">${r.ch.beat?'🎉 You beat the '+r.ch.t.toFixed(1)+'s challenge by '+(r.sc-r.ch.t).toFixed(1)+'s':'🎯 Challenge '+r.ch.t.toFixed(1)+'s · '+(r.ch.t-r.sc).toFixed(1)+'s short. Run it back!'}</p>`:(!r.nb&&best>r.sc?`<p class="small" style="margin:6px 0 0">🎯 ${(best-r.sc).toFixed(1)}s from your best (${best.toFixed(1)}s)</p>`:'')}<div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(cl+1).icon} ${LVL(cl+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(bal)} / ${fmt(hi)} $COOKED</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">📲 Challenge a friend</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double $COOKED</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
 r._p=cardBlob(r);$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
-$('share').onclick=()=>shareCard(r)}
+$('share').onclick=()=>shareScreen(r.sc,()=>showOver(r))}
 function wallet(back=menu){
 let sol=ld('cooked_sol','');
 $('card').innerHTML=`<h1><i class=cc></i> Wallet</h1><p class="small">Your $COOKED</p><div class="big" id="bal" style="font-size:38px">${fmt(bal)}</div><p class="small">Total earned so far: ${fmt(tot)} <i class=cc></i></p><p class="small">This is your $COOKED balance. It is in-game points with no cash value yet. The $COOKED token is not live yet, so keep playing and keep stacking them.</p><p>Submit your Solana (SOL) address</p><p class="small">Add the wallet address you want linked to your $COOKED so you are on the list when $COOKED launches. Never share a seed phrase or private key. We only ever need the public address.</p><input id="sol" placeholder="Your Solana address" autocomplete="off" autocapitalize="off" spellcheck="false" value="${sol}"><button id="solsv">${sol?'Update address':'Submit address'}</button><div id="res"></div><button class="alt" id="bk">Back</button>`;
@@ -641,8 +650,8 @@ $('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision fo
 <p class="small">Airdrop allocations come from the community campaigns share of the supply and are based on verified play. Goals and dates can change as we build, and we will announce updates in the game.</p>
 <button class="play" id="adw">${hasSol?'Update my Solana address':'Submit my Solana address'}</button><button class="alt" id="bk">Back</button>`;
 $('bk').onclick=menu;$('adw').onclick=()=>wallet(airdrop)}
-function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(bal)+1}: ${LVL(lvlOf(bal)).name} · ${fmt(bal)} / ${fmt(thr(lvlOf(bal)+1))} $COOKED for Level ${lvlOf(bal)+2}</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your $COOKED.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of $COOKED? Play a run or watch an ad in the shop to earn more.</p>':''}`;
-$('go').onclick=startGame;$('mc').onclick=challenges;$('ma').onclick=airdrop;$('mw').onclick=()=>wallet(menu);$('mh').onclick=howto;$('ms').onclick=()=>shop(menu);$('mm').onclick=toggleMute;$('mp').onclick=()=>openWP();$('mtk').onclick=()=>openWP('tokenomics')}
+function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(bal)+1}: ${LVL(lvlOf(bal)).name} · ${fmt(bal)} / ${fmt(thr(lvlOf(bal)+1))} $COOKED for Level ${lvlOf(bal)+2}</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your $COOKED.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1} · <a class="lk" id="mch">Challenge a friend</a></p>`:''}${spon()}${streakCard()}${chal?chalBanner():''}<button class="play" id="go">${chal?'▶ Take the challenge':'▶ Play'}</button><div class="grid"><button class="alt" id="mc">🎯 Daily ${chState().done.length}/3</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of $COOKED? Play a run or watch an ad in the shop to earn more.</p>':''}`;
+$('go').onclick=startGame;$('mc').onclick=challenges;if($('stk'))$('stk').onclick=claimStreak;if($('chx'))$('chx').onclick=()=>{chalClear();menu()};if($('mch'))$('mch').onclick=()=>shareScreen(best,menu);$('ma').onclick=airdrop;$('mw').onclick=()=>wallet(menu);$('mh').onclick=howto;$('ms').onclick=()=>shop(menu);$('mm').onclick=toggleMute;$('mp').onclick=()=>openWP();$('mtk').onclick=()=>openWP('tokenomics')}
 
 const CAP=[[0,'COOKED','Survive real life.',1],[1.6,'This is you','A calm little orb. Keep your stress low.'],[3.4,'Life throws problems at you','Exams, low battery, no reply. Dodge them.'],[6.4,'Get hit and it costs you','Stress goes up and you lose $COOKED. Big problems cost more.'],[9.2,'Small joys cool you down','Coffee, rest, music. Catch them to calm down.'],[12.2,'Level up through real life','Student, job, family and beyond. It never ends.'],[14.8,'How long can you stay cool?','Drag left and right to move.']];
 const EV=[[3.4,'📚','Exam tomorrow','d'],[4.1,'🔋','Phone at 1%','d'],[4.8,'💬','Seen, no reply','d'],[6.2,'💸','Rent due','h',5],[6.9,'🧾','Surprise bill','h',4],[9,'☕','Coffee break','c'],[9.7,'😴','Nap','c'],[10.4,'🎧','Favorite song','c']];
@@ -672,6 +681,34 @@ if(iT>=17.5)endIntro()}
 
 
 let inv=Object.assign({skin:'Classic',owned:['Classic'],shield:0,ins:0,adAt:0,adDay:'',adN:0},ld('cooked_inv',{})),mute=ld('cooked_mute',false),AC=null;
+let chal=null;
+try{const q=new URLSearchParams(location.search),c=parseFloat(q.get('c'));
+if(c>=3&&c<=3600){chal={t:+c.toFixed(1),at:Date.now()};sv('cooked_chal',chal);history.replaceState(null,'',location.pathname)}
+else{const o=ld('cooked_chal',null);if(o&&o.t&&Date.now()-o.at<6048e5)chal=o}}catch(e){}
+function chalClear(){chal=null;sv('cooked_chal',null)}
+function chalUrl(sec){return (CFG.site||location.origin+'/').split(/[?#]/)[0]+'?c='+(+sec).toFixed(1)}
+function chalText(sec){return '🔥 I survived '+(+sec).toFixed(1)+'s in Cooked. Think you can beat me?'}
+function shareScreen(sec,back){const u=chalUrl(sec),tx=chalText(sec),full=tx+'\n'+u,e=encodeURIComponent;
+$('card').innerHTML=`<h2>📲 Challenge a friend</h2><p class="small">Send your ${(+sec).toFixed(1)}s. When they open the link, the game sets it as their target.</p><div class="shp">${tx}<br><span>${u}</span></div><div class="grid"><button class="alt" id="shwa">💬 WhatsApp</button><button class="alt" id="shx">𝕏 Post on X</button><button class="alt" id="shtg">✈️ Telegram</button><button class="alt" id="shcp">🔗 Copy link</button></div>${navigator.share?'<button class="alt" id="shmo" style="width:100%;margin-top:8px">More apps…</button>':''}<button class="alt" id="shbk" style="width:100%;margin-top:8px">Back</button>`;
+const op=h=>{try{window.open(h,'_blank')}catch(x){location.href=h}};
+$('shwa').onclick=()=>op('https://wa.me/?text='+e(full));
+$('shx').onclick=()=>op('https://twitter.com/intent/tweet?text='+e(tx)+'&url='+e(u));
+$('shtg').onclick=()=>op('https://t.me/share/url?url='+e(u)+'&text='+e(tx));
+$('shcp').onclick=async()=>{try{await navigator.clipboard.writeText(full);say('Link copied!')}catch(x){const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');say('Link copied!')}catch(y){say('Could not copy')}ta.remove()}};
+if($('shmo'))$('shmo').onclick=()=>{navigator.share({text:full}).catch(()=>{})};
+$('shbk').onclick=back}
+const STR=[100,150,200,300,400,600,1000];
+const dkey=(o=0)=>{const d=new Date(Date.now()+o*864e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function strState(){const s=Object.assign({n:0,last:''},ld('cooked_streak',{})),today=dkey(),claimed=s.last===today,cont=s.last===dkey(-1),day=claimed?s.n:(cont?s.n+1:1);
+return{s,today,claimed,day,lost:!claimed&&s.n>0&&!cont,rew:STR[(day-1)%7],next:STR[day%7]}}
+function claimStreak(){const z=strState();if(z.claimed)return;bal+=z.rew;tot+=z.rew;sv('cooked_bal',bal);sv('cooked_tot',tot);sv('cooked_streak',{n:z.day,last:z.today});sfx&&sfx('win');say('+'+fmt(z.rew)+' $COOKED · Day '+z.day+' streak 🔥');menu()}
+function streakCard(){const z=strState(),cyc=(z.day-1)%7;
+const dots=STR.map((v,i)=>'<i class="'+((i<cyc||(z.claimed&&i===cyc))?'d':(i===cyc?'n':''))+'"></i>').join('');
+const head=z.claimed?'🔥 Day '+z.day+' streak':(z.lost?'🔥 Streak reset. Day 1':'🔥 Day '+z.day+' streak');
+const right=z.claimed?'<span>Back tomorrow: +'+fmt(z.next)+'</span>':'<button id="stk">Claim +'+fmt(z.rew)+'</button>';
+return '<div class="strk"><div class="strh"><b>'+head+'</b>'+right+'</div><div class="strd">'+dots+'</div></div>'}
+function chalBanner(){return '<div class="chb"><div><b>🎯 A friend challenged you</b><span>Survive '+chal.t.toFixed(1)+'s'+(best?' · your best is '+best.toFixed(1)+'s':'')+'</span></div><button class="alt" id="chx" aria-label="Dismiss">✕</button></div>'}
+
 const sinv=()=>sv('cooked_inv',inv);
 const skM=()=>((SK.find(k=>k.n===inv.skin)||SK[0]).m||1);
 const SK=[{n:'Classic',m:1,cost:0,a:[200,170,255],b:[150,90,255]},{n:'Gold',m:1.25,cost:2000,a:[255,226,140],b:[255,176,40]},{n:'Neon',m:1.5,cost:3500,a:[170,255,196],b:[60,230,120]}];
@@ -734,7 +771,7 @@ T('COOKED',170,'bold 120px sans-serif','#fff');T('Survive real life',245,'60px s
 T('Level '+(r.L+1)+': '+V.name,790,'52px sans-serif','#fff');T(r.sc.toFixed(1)+'s',960,'bold 130px sans-serif','#fff');
 T((r.net>=0?'+':'')+fmt(r.net)+' $COOKED',1050,'56px sans-serif',r.net>=0?'#8fffa8':'#ff9f8f');T('Lost '+fmt(r.loss)+' to life problems',1120,'44px sans-serif','#d8c8ee');T('Can you beat this?',1260,'bold 52px sans-serif','#ff9f43');
 c.toBlob(b=>res(b),'image/png')})}
-function shareText(r){const V=LVL(r.L);return '🔥 I got COOKED!\n'+V.icon+' Level '+(r.L+1)+': '+V.title+'\n⏱️ '+r.sc.toFixed(1)+'s  ·  💰 '+fmt(bal)+' $COOKED\n\nThink you can beat me? 👇\n'+(CFG.site||location.href)}
+function shareText(r){const V=LVL(r.L);return '🔥 I got COOKED!\n'+V.icon+' Level '+(r.L+1)+': '+V.title+'\n⏱️ '+r.sc.toFixed(1)+'s  ·  💰 '+fmt(bal)+' $COOKED\n\nThink you can beat me? 👇\n'+chalUrl(r.sc)}
 async function shareCard(r){const text=shareText(r);let b=null;try{b=await(r._p||cardBlob(r))}catch(e){}
 const f=b?new File([b],'cooked.png',{type:'image/png'}):null;
 try{if(f&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}if(navigator.share){await navigator.share({text});return}}
@@ -821,7 +858,7 @@ function draw(){
  if(slow>0){g.strokeStyle='rgba(255,226,122,.3)';g.lineWidth=4;g.strokeRect(3,3,W-6,H-6)}
  g.restore();
 }
-function loop(n){requestAnimationFrame(loop);if(S==='play'&&t>best&&t-lastRec>3){lastRec=t;recBest()}if(S==='play'||S==='intro'||S==='cd'){qAcc+=Math.min(100,n-last);if(++qN>=90){if(qAcc/qN>26&&DPRMAX>1){DPRMAX=Math.max(1,DPRMAX-.25);rs()}qAcc=0;qN=0}}else{qAcc=0;qN=0}const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
+function loop(n){requestAnimationFrame(loop);if(S==='play'&&chal&&!chal.hit&&t>=chal.t){chal.hit=1;say('🏆 Challenge beaten! Keep going')}if(S==='play'&&t>best&&t-lastRec>3){lastRec=t;recBest()}if(S==='play'||S==='intro'||S==='cd'){qAcc+=Math.min(100,n-last);if(++qN>=90){if(qAcc/qN>26&&DPRMAX>1){DPRMAX=Math.max(1,DPRMAX-.25);rs()}qAcc=0;qN=0}}else{qAcc=0;qN=0}const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
 try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
 requestAnimationFrame(n=>{last=n;loop(n)});
 
