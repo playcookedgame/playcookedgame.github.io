@@ -559,7 +559,7 @@ const cv=document.getElementById('c'),g=cv.getContext('2d');
 let W,H,DPR,DPRMAX=1.5,qAcc=0,qN=0;function rs(){DPR=Math.min(devicePixelRatio||1,DPRMAX);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;g.setTransform(DPR,0,0,DPR,0,0)}rs();addEventListener('resize',rs);
 const BAD=[['📚','Exam tomorrow'],['💸','Rent due'],['🔋','Phone at 1%'],['💬','Seen, no reply'],['⏰','Alarm didn\'t ring'],['📉','Salary delayed'],['🚦','Stuck in traffic'],['📶','No network'],['🧾','Surprise bill'],['📧','Per my last email'],['🦟','Mosquitoes all night'],['🔌','Power cut'],['⛽','Fuel price up'],['🚌','Missed the bus'],['🤒','Fell sick'],['📱','Cracked screen'],['🧺','Laundry pile'],['👀','Boss wants a call'],['🍜','Fridge is empty'],['💔','Ghosted'],['🪫','Data finished'],['🏦','Bank alert: debit']],
 COOL=[['☕',12,'Coffee break'],['😴',18,'Nap'],['🧊',26,'Cold drink'],['🎧',14,'Favorite song'],['🍕',16,'Good food'],['🫂',20,'Friend check-in']];
-let insOn=false,dblT=0,fastT=0,hustle=0,evT=45,lvl=0,runC=0,peakC=0,loss=0,stat={},S='menu',heat=0,t=0,items=[],parts=[],px=0,tx=0,shake=0,spawnT=0,waveT=0,combo=0,shield=0,slow=0,flash=0,hitFlash=0,best=0,last=0,scroll=0;
+let insOn=false,dblT=0,fastT=0,hustle=0,evT=45,lvl=0,runC=0,peakC=0,loss=0,stat={},S='menu',heat=0,t=0,items=[],parts=[],px=0,tx=0,shake=0,spawnT=0,waveT=0,combo=0,shield=0,slow=0,flash=0,hitFlash=0,best=0,bestAtStart=0,lastRec=0,last=0,scroll=0;
 try{best=+localStorage.getItem('cooked_best')||0}catch(e){}
 const $=id=>document.getElementById(id),keys={};
 function buzz(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
@@ -569,7 +569,7 @@ const HY=()=>H*.3,PY=()=>H*.8;
 function proj(wx,d){const f=Math.pow(Math.max(1-d,0),1.7);return{x:W/2+wx*W*.5*(.1+.9*f),y:HY()+(PY()-HY())*f,s:.1+.9*f,f}}
 function spawn(wx,kind){items.push({wx,d:1,kind,e:kind.e,v:kind.v||0,cool:kind.cool||0,sev:kind.sev||0,lab:kind.lab||'',rot:Math.random()*6})}
 function startGame(){if(ld('cooked_intro',0))beginRun();else intro()}
-function beginRun(){S='play';lvl=lvlOf(bal);runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
+function beginRun(){S='play';lvl=lvlOf(bal);bestAtStart=best;lastRec=0;runC=0;peakC=0;loss=0;stat={caught:0,dodged:0,hits:0,combo:0,shield:0,slow:0};heat=0;t=0;items=[];parts=[];px=tx=0;spawnT=.4;waveT=16;combo=0;shield=inv.shield>0?1:0;if(shield){inv.shield--;sinv()}insOn=inv.ins>0;if(insOn){inv.ins--;sinv()}slow=0;dblT=0;fastT=0;hustle=0;evT=45;last=performance.now();
 $('ov').classList.add('hide');$('hud').classList.remove('hide');$('pause').classList.remove('hide');say('Level 1: Student life')}
 function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=60+Math.random()*220;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,l:.7,c:col})}}
 const LV=[
@@ -595,7 +595,7 @@ if(bal===null||!ld('cooked_v2',0)){bal=Math.min(bal===null?Infinity:bal,CFG.star
 let tot=ld('cooked_tot',null);if(tot===null||tot<CFG.starterCoins){tot=Math.max(tot||0,bal,CFG.starterCoins);sv('cooked_tot',tot)}
 if(!myId){const a=new Uint16Array(2);(window.crypto||{getRandomValues(x){x[0]=Math.random()*65535;x[1]=Math.random()*65535}}).getRandomValues(a);const h=n=>n.toString(16).toUpperCase().padStart(4,'0');myId='CK-'+h(a[0])+'-'+h(a[1]);sv('cooked_id',myId)}
 function cpy(x,b){try{navigator.clipboard.writeText(x).then(()=>b.textContent='Copied',()=>b.textContent='Select and copy')}catch(e){b.textContent='Select and copy'}}
-function end(){const fails=ld('cooked_fails',0)+1;sv('cooked_fails',fails);S='over';buzz([60,40,120]);sfx('over');const sc=+t.toFixed(1);let nb=false;if(sc>best){best=sc;nb=true;try{localStorage.setItem('cooked_best',best)}catch(e){}}
+function end(){const fails=ld('cooked_fails',0)+1;sv('cooked_fails',fails);S='over';buzz([60,40,120]);sfx('over');const sc=+t.toFixed(1);let nb=sc>bestAtStart;if(sc>best){best=sc;try{localStorage.setItem('cooked_best',best)}catch(e){}}
 if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl);const raw=Math.floor(runC),net=raw,earn=Math.max(0,raw+Math.floor(loss)),done=checkCh(sc),bonus=done.reduce((a,c)=>a+c.rew,0);bal=Math.max(0,bal+net+bonus);sv('cooked_bal',bal);tot+=Math.max(0,net)+bonus;sv('cooked_tot',tot);
 $('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails})}
 function showOver(r){const V=LVL(r.L);
@@ -821,7 +821,7 @@ function draw(){
  if(slow>0){g.strokeStyle='rgba(255,226,122,.3)';g.lineWidth=4;g.strokeRect(3,3,W-6,H-6)}
  g.restore();
 }
-function loop(n){requestAnimationFrame(loop);if(S==='play'||S==='intro'||S==='cd'){qAcc+=Math.min(100,n-last);if(++qN>=90){if(qAcc/qN>26&&DPRMAX>1){DPRMAX=Math.max(1,DPRMAX-.25);rs()}qAcc=0;qN=0}}else{qAcc=0;qN=0}const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
+function loop(n){requestAnimationFrame(loop);if(S==='play'&&t>best&&t-lastRec>3){lastRec=t;recBest()}if(S==='play'||S==='intro'||S==='cd'){qAcc+=Math.min(100,n-last);if(++qN>=90){if(qAcc/qN>26&&DPRMAX>1){DPRMAX=Math.max(1,DPRMAX-.25);rs()}qAcc=0;qN=0}}else{qAcc=0;qN=0}const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
 try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
 requestAnimationFrame(n=>{last=n;loop(n)});
 
@@ -890,8 +890,9 @@ cards.forEach(c=>{pop[c.i]*=Math.exp(-dt*8);let z=1+.1*pop[c.i],op=1;if(fin>0){o
 flo.forEach(f=>{f.sp.position.y=f.y+Math.sin(t*1.4+f.p)*.25});
 r.render(sc,cam)}catch(e){fail3D(e)}}
 $('splash').classList.add('d3');goSplash(false);raf=requestAnimationFrame(frame)}
-function bankRun(){const r=Math.floor(runC);runC=0;if(!r)return;bal=Math.max(0,bal+r);sv('cooked_bal',bal);tot+=Math.max(0,r);sv('cooked_tot',tot)}
-function pauseGame(){if(S!=='play')return;S='paused';for(const k in keys)keys[k]=0;$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
+function recBest(){const sc=+t.toFixed(1);if(sc>best){best=sc;try{localStorage.setItem('cooked_best',best)}catch(e){}}if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl)}
+function bankRun(){recBest();const r=Math.floor(runC);runC=0;if(!r)return;bal=Math.max(0,bal+r);sv('cooked_bal',bal);tot+=Math.max(0,r);sv('cooked_tot',tot)}
+function pauseGame(){if(S!=='play')return;S='paused';recBest();for(const k in keys)keys[k]=0;$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
 const IP='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>',IR='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',IM='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 $('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Game paused</p><h2 style="margin:4px 0 2px">Level ${lvl+1}</h2><p class="small" style="margin:0 0 10px">${LVL(lvl).name}</p><div class="ostats"><div><b>${t.toFixed(1)}s</b><span>Time</span></div><div><b>${Math.round(heat)}%</b><span>Stress</span></div><div><b>${fmt(runC)}</b><span>$COOKED</span></div></div><button class="play ib" id="rs">${IP}Resume</button><div class="grid"><button class="alt ib" id="rr">${IR}Restart</button><button class="alt ib" id="rq">${IM}Menu</button></div><p class="small">Restarting or leaving keeps the $COOKED you have earned so far.</p>`;
 $('rs').onclick=resume;$('rr').onclick=()=>{bankRun();$('ov').style.background='';beginRun()};$('rq').onclick=()=>{bankRun();$('ov').style.background='';S='menu';$('hud').classList.add('hide');menu()}}
@@ -899,7 +900,7 @@ let cdT=0,cdN=0;
 function resume(){if(S!=='paused')return;$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=3;cdN=0}
 function cdStep(dt){cdT-=dt;const n=Math.ceil(cdT);if(n!==cdN&&n>0){cdN=n;say(String(n))}if(cdT<=0){S='play';say('Go!')}}
 $('pause').onclick=pauseGame;
-document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame()});addEventListener('pagehide',()=>{if(S==='play')recBest()});
 
 
 let wpOpen=false,wpDoc=null;
