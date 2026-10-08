@@ -123,7 +123,7 @@ h2{margin:0 0 8px;font-size:26px}
 #splash.fb.go .spc{animation:spcard 1.15s ease both;animation-delay:calc(var(--i)*1.15s + .6s)}
 #splash.go #stamp{animation:slam .5s 8.8s cubic-bezier(.2,1.6,.4,1) both}
 #splash.go #sptag{animation:fadein .6s 9.5s both}
-#pause{position:fixed;right:12px;top:calc(env(safe-area-inset-top,0px) + 58px);width:40px;height:40px;min-width:0;padding:0;margin:0;border-radius:50%;z-index:6;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(12,8,28,.5);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform .15s,background .15s}#pause:active{transform:scale(.92);background:rgba(255,255,255,.18)}#pause.hide{display:none}.ib{display:inline-flex;align-items:center;justify-content:center;gap:8px}#skip.hide{display:none}#skip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:rgba(12,8,28,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#pause{position:fixed;right:12px;top:calc(env(safe-area-inset-top,0px) + 58px);width:40px;height:40px;min-width:0;padding:0;margin:0;border-radius:50%;z-index:6;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(12,8,28,.72);border:1px solid rgba(255,255,255,.25);box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform .15s,background .15s}#pause:active{transform:scale(.92);background:rgba(255,255,255,.18)}#pause.hide{display:none}.ib{display:inline-flex;align-items:center;justify-content:center;gap:8px}#skip.hide{display:none}#skip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:rgba(12,8,28,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 button:disabled{opacity:.45;cursor:default}
 #adbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)}#adbox.hide{display:none}
 #adc{width:100%;max-width:440px;max-height:100%;display:flex;flex-direction:column;gap:10px;background:#160d26;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
@@ -331,7 +331,7 @@ function buildWhitepaper(CFG) {
   sec('game', 'The game', [
     P('You are a glowing orb. Life problems fall toward you. Drag to dodge them and catch the things that cool you down. Your stress bar rises on its own and with every hit. At 100% you are cooked.'),
     UL([
-      'Endless levels, unlocked by the coins in your balance. Level 1 starts at the 5,000 starter coins and every next level needs a bigger balance than the last. Student life, Job hunt, Adulting, Family & love, Parenting, Career climb, Building a home, Caring for parents, Planning ahead, then Life, Chapter 1, 2, 3 and so on forever.',
+      'Endless levels, unlocked by the $COOKED in your balance. Level 1 starts at the 5,000 starter $COOKED and every next level needs a bigger balance than the last. Student life, Job hunt, Adulting, Family & love, Parenting, Career climb, Building a home, Caring for parents, Planning ahead, then Life, Chapter 1, 2, 3 and so on forever.',
       'Problems with weight. More than 70 everyday problems, each with a severity. Rent and hospital bills hurt more than a weak network.',
       'Cooling items and power-ups. Coffee, a nap, a song, a friend\'s call. A shield blocks one hit. Slow motion slows time.',
       'Life events. About once a minute you face a real decision with a trade-off: lend money to a friend, accept overtime, take a day off.',
@@ -346,22 +346,22 @@ function buildWhitepaper(CFG) {
   var LV_E = CFG.levels || { base: 5000, step: 15000, power: 1.6 };
   var levelRows = LVNAMES.map(function (nm, i) {
     var need = i === 0 ? LV_E.base : Math.round((LV_E.base + LV_E.step * Math.pow(i, LV_E.power)) / 1000) * 1000;
-    return [String(i + 1), nm, n(need) + (i === 0 ? ' (the starter coins)' : '')];
+    return [String(i + 1), nm, n(need) + (i === 0 ? ' (the starter $COOKED)' : '')];
   });
 
   sec('economy', 'Two-layer economy', [
     P('Cooked has two kinds of value. Keeping them separate keeps the game fast and the token scarce.'),
-    { t: 'table', head: ['', 'Cooked Coins', sym + ' token'], rows: [
+    { t: 'table', head: ['', 'In-game $COOKED', sym + ' token'], rows: [
       ['What it is', 'In-game points', 'On-chain token'],
-      ['How you get it', 'Playing: you earn coins by surviving, dodging problems and catching cooling items, and lose coins every time a problem hits', 'Seasonal rewards for verified fair play'],
+      ['How you get it', 'Playing: you earn $COOKED by surviving, dodging problems and catching cooling items, and lose $COOKED every time a problem hits', 'Seasonal rewards for verified fair play'],
       ['What it buys', 'Shop items, revives, boosts', 'Premium cosmetics, season passes, votes'],
       ['Supply', 'Open, but earning is slow by design', 'Fixed at ' + n(S)],
-      ['Can it leave the game?', 'No. Coins have no cash value and cannot be withdrawn', 'Yes, to your own wallet, after checks'],
+      ['Can it leave the game?', 'No. In-game $COOKED has no cash value and cannot be withdrawn', 'Yes, to your own wallet, after checks'],
     ] },
-    H('Starter coins'),
-    P('New players start with ' + n(CFG.starterCoins) + ' coins. Starter coins are locked and cannot be sent to other players, so nobody can create many accounts to collect free coins.'),
+    H('Starter $COOKED'),
+    P('New players start with ' + n(CFG.starterCoins) + ' $COOKED. Starter $COOKED is locked and cannot be sent to other players, so nobody can create many accounts to collect free $COOKED.'),
     H('Levels and your balance'),
-    P('Your level comes from the coins you are holding right now: the ' + n(CFG.starterCoins) + ' starter coins plus whatever you have earned and not spent. Level 1 starts at the starter coins, and every new level needs a bigger balance than the one before, so each step is harder than the last. Coins are earned slowly on purpose, by surviving, dodging problems and catching cooling items, and every problem you hit takes coins off your balance. Coins you spend in the shop or lose to hits no longer count, so your level can go down if your balance drops.'),
+    P('Your level comes from the $COOKED you are holding right now: the ' + n(CFG.starterCoins) + ' starter $COOKED plus whatever you have earned and not spent. Level 1 starts at the starter $COOKED, and every new level needs a bigger balance than the one before, so each step is harder than the last. $COOKED is earned slowly on purpose, by surviving, dodging problems and catching cooling items, and every problem you hit takes $COOKED off your balance. $COOKED you spend in the shop or lose to hits no longer counts, so your level can go down if your balance drops.'),
     { t: 'table', head: ['Level', 'Stage', 'Balance needed'], rows: levelRows },
     P('After that the stages continue as Life, Chapter 2, 3 and so on, each one needing a bigger balance than the last, with no finish line.'),
   ]);
@@ -448,8 +448,8 @@ function buildWhitepaper(CFG) {
       'Balances are held by the server in a database, not in the browser.',
       'Every run is timed by the server. What a run can earn is capped by how long it really lasted.',
       'Daily earning caps, rate limits and one-use run settlement.',
-      'Coin transfers are atomic, so the same coins cannot be spent twice, even with many requests at once.',
-      'Starter coins are locked and cannot be moved to other accounts.',
+      '$COOKED transfers are atomic, so the same $COOKED cannot be spent twice, even with many requests at once.',
+      'Starter $COOKED is locked and cannot be moved to other accounts.',
     ]),
     H('Planned'),
     UL([
@@ -556,7 +556,7 @@ if (typeof module !== 'undefined') module.exports = { buildWhitepaper };
 </script>
 <script>
 const cv=document.getElementById('c'),g=cv.getContext('2d');
-let W,H,DPR;function rs(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;g.setTransform(DPR,0,0,DPR,0,0)}rs();addEventListener('resize',rs);
+let W,H,DPR,DPRMAX=1.5,qAcc=0,qN=0;function rs(){DPR=Math.min(devicePixelRatio||1,DPRMAX);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;g.setTransform(DPR,0,0,DPR,0,0)}rs();addEventListener('resize',rs);
 const BAD=[['📚','Exam tomorrow'],['💸','Rent due'],['🔋','Phone at 1%'],['💬','Seen, no reply'],['⏰','Alarm didn\'t ring'],['📉','Salary delayed'],['🚦','Stuck in traffic'],['📶','No network'],['🧾','Surprise bill'],['📧','Per my last email'],['🦟','Mosquitoes all night'],['🔌','Power cut'],['⛽','Fuel price up'],['🚌','Missed the bus'],['🤒','Fell sick'],['📱','Cracked screen'],['🧺','Laundry pile'],['👀','Boss wants a call'],['🍜','Fridge is empty'],['💔','Ghosted'],['🪫','Data finished'],['🏦','Bank alert: debit']],
 COOL=[['☕',12,'Coffee break'],['😴',18,'Nap'],['🧊',26,'Cold drink'],['🎧',14,'Favorite song'],['🍕',16,'Good food'],['🫂',20,'Friend check-in']];
 let insOn=false,dblT=0,fastT=0,hustle=0,evT=45,lvl=0,runC=0,peakC=0,loss=0,stat={},S='menu',heat=0,t=0,items=[],parts=[],px=0,tx=0,shake=0,spawnT=0,waveT=0,combo=0,shield=0,slow=0,flash=0,hitFlash=0,best=0,last=0,scroll=0;
@@ -600,17 +600,17 @@ if(lvl>ld('cooked_bl',0))sv('cooked_bl',lvl);const raw=Math.floor(runC),net=raw,
 $('hud').classList.add('hide');$('pause').classList.add('hide');$('ov').classList.remove('hide');showOver({sc,nb,earn,loss:Math.floor(loss),net,done,bonus,L:lvl,n:fails})}
 function showOver(r){const V=LVL(r.L);
 const cl=lvlOf(bal),lo=thr(cl),hi=thr(cl+1),pg=Math.max(0,Math.min(100,Math.round((bal-lo)/(hi-lo)*100))),more=r.n<2;
-$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(cl+1).icon} ${LVL(cl+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(bal)} / ${fmt(hi)} coins</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double coins</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Life check</p><div class="big">${V.icon}</div><div class="verdict">${V.title}</div><p class="small" style="margin:4px 0 0">Level ${r.L+1}: ${V.name} · ${r.sc.toFixed(1)}s${r.nb?' · 🏆 New best!':''}</p><div class="coin">${r.net>=0?'+':''}${fmt(r.net)} <i class=cc></i></div><div class="ostats"><div><b>${fmt(r.earn)}</b><span>Earned</span></div><div><b>${fmt(r.loss)}</b><span>Lost</span></div><div><b>${fmt(bal)}</b><span>Balance</span></div></div>${r.done.length?'<div class="odone">'+r.done.map(c=>`<div><span>✅ ${c.name}</span><b>+${fmt(c.rew)} <i class=cc></i></b></div>`).join('')+'</div>':''}<div class="onext"><div class="small">Next: ${LVL(cl+1).icon} ${LVL(cl+1).name}</div><div class="obar"><i style="width:${pg}%"></i></div><div class="small">${fmt(bal)} / ${fmt(hi)} $COOKED</div></div><button class="play" id="again">▶ Run it back</button><div class="grid"><button class="alt" id="share">Share</button>${more?'<button class="alt" id="wl">Wallet</button>':''}${more&&r.net>0&&!r.dbl?'<button class="alt" id="dbl">📺 Double $COOKED</button>':''}${more?'<button class="alt" id="sc">🖼️ Share card</button>':''}<button class="alt" id="mn">Menu</button></div>`;
 r._p=cardBlob(r);$('again').onclick=startGame;$('mn').onclick=menu;if(r.net>0&&!r.dbl&&r.n<2)$('dbl').onclick=()=>runAd('double',()=>{bal+=r.net;sv('cooked_bal',bal);r.dbl=1;showOver(r)});if(r.n<2){$('sc').onclick=()=>shareCard(r);$('wl').onclick=()=>wallet(()=>showOver(r))}
 $('share').onclick=()=>shareCard(r)}
 function wallet(back=menu){
 let sol=ld('cooked_sol','');
-$('card').innerHTML=`<h1><i class=cc></i> Wallet</h1><p class="small">Your Cooked Coins</p><div class="big" id="bal" style="font-size:38px">${fmt(bal)}</div><p class="small">Total earned so far: ${fmt(tot)} <i class=cc></i></p><p class="small">These are your cooked coins. They are in-game points with no cash value yet. The $COOKED token is not live yet, so keep playing and keep stacking them.</p><p>Submit your Solana (SOL) address</p><p class="small">Add the wallet address you want linked to your coins so you are on the list when $COOKED launches. Never share a seed phrase or private key. We only ever need the public address.</p><input id="sol" placeholder="Your Solana address" autocomplete="off" autocapitalize="off" spellcheck="false" value="${sol}"><button id="solsv">${sol?'Update address':'Submit address'}</button><div id="res"></div><button class="alt" id="bk">Back</button>`;
+$('card').innerHTML=`<h1><i class=cc></i> Wallet</h1><p class="small">Your $COOKED</p><div class="big" id="bal" style="font-size:38px">${fmt(bal)}</div><p class="small">Total earned so far: ${fmt(tot)} <i class=cc></i></p><p class="small">This is your $COOKED balance. It is in-game points with no cash value yet. The $COOKED token is not live yet, so keep playing and keep stacking them.</p><p>Submit your Solana (SOL) address</p><p class="small">Add the wallet address you want linked to your $COOKED so you are on the list when $COOKED launches. Never share a seed phrase or private key. We only ever need the public address.</p><input id="sol" placeholder="Your Solana address" autocomplete="off" autocapitalize="off" spellcheck="false" value="${sol}"><button id="solsv">${sol?'Update address':'Submit address'}</button><div id="res"></div><button class="alt" id="bk">Back</button>`;
 $('bk').onclick=back;
 if(sol)$('res').textContent='Saved address: '+sol.slice(0,4)+'...'+sol.slice(-4);
 $('solsv').onclick=()=>{const v=$('sol').value.trim(),r=$('res');
 if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)){r.textContent='That does not look like a valid Solana address. It is 32 to 44 letters and numbers.';return}
-sv('cooked_sol',v);$('solsv').textContent='Update address';r.textContent='Address saved: '+v.slice(0,4)+'...'+v.slice(-4)+'. You have '+fmt(bal)+' cooked coins ready.'}}
+sv('cooked_sol',v);$('solsv').textContent='Update address';r.textContent='Address saved: '+v.slice(0,4)+'...'+v.slice(-4)+'. You have '+fmt(bal)+' $COOKED ready.'}}
 const SEV={'💸':5,'🏥':5,'🧾':4,'🏦':4,'📉':4,'🤒':4,'🙏':4,'💔':4,'⛽':3,'📱':3,'🔌':3,'🎁':3,'📚':3,'🧑‍💼':3,'🛠️':3,'📝':2,'😵':2,'⏰':2,'📄':2,'🚌':2,'👀':2,'💍':2,'🔋':1,'💬':1,'🪫':1,'🍜':1,'📧':1,'🚦':1,'📶':1,'🧺':1,'🦟':1,'📞':1},PEN=[0,2,4,8,12,20];Object.assign(SEV,{'🏫':4,'👶':3,'🤧':3,'🍼':2,'🧱':3,'🏗️':4,'📜':4,'🚰':3,'🔨':4,'🌧️':3,'💊':3,'🎗️':3,'🚗':4,'🪪':2,'📊':3,'🖥️':3,'😤':3,'🩺':3,'🪙':4,'🤝':3});
 const CH=[{id:'rush',name:'Morning Rush',txt:'Survive 20 seconds',rew:100,f:(s,t)=>t>=20},
 {id:'bills',name:'Pay the Bills',txt:'Reach Level 3: Adulting',rew:300,f:(s,t,l)=>l>=2},
@@ -624,12 +624,12 @@ const CH=[{id:'rush',name:'Morning Rush',txt:'Survive 20 seconds',rew:100,f:(s,t
 const todays=()=>{const k=Math.floor(Date.now()/864e5)%CH.length;return[0,3,6].map(i=>CH[(k+i)%CH.length])};
 function chState(){const d=new Date().toISOString().slice(0,10);let c=ld('cooked_ch',null);if(!c||c.d!==d){c={d,done:[]};sv('cooked_ch',c)}return c}
 function checkCh(sc){const c=chState(),out=[];for(const h of todays())if(!c.done.includes(h.id)&&h.f(stat,sc,lvl)){c.done.push(h.id);out.push(h)}sv('cooked_ch',c);return out}
-function challenges(){const c=chState();$('card').innerHTML=`<h2>🎯 Daily challenges</h2><p class="small">Real-life tasks. They reset every day. Finish one in a run to earn the coins.</p>${todays().map(h=>`<div class="ch ${c.done.includes(h.id)?'ok':''}"><div><b>${h.name}</b><br><small>${h.txt}</small></div><div>${c.done.includes(h.id)?'✅':'<i class=cc></i> '+fmt(h.rew)}</div></div>`).join('')}<button id="go">Play</button><button class="alt" id="bk">Back</button>`;$('go').onclick=startGame;$('bk').onclick=menu}
+function challenges(){const c=chState();$('card').innerHTML=`<h2>🎯 Daily challenges</h2><p class="small">Real-life tasks. They reset every day. Finish one in a run to earn the $COOKED.</p>${todays().map(h=>`<div class="ch ${c.done.includes(h.id)?'ok':''}"><div><b>${h.name}</b><br><small>${h.txt}</small></div><div>${c.done.includes(h.id)?'✅':'<i class=cc></i> '+fmt(h.rew)}</div></div>`).join('')}<button id="go">Play</button><button class="alt" id="bk">Back</button>`;$('go').onclick=startGame;$('bk').onclick=menu}
 function howto(){$('card').innerHTML=`<h2>❓ How to play</h2>
-<div class="leg bad"><b>Dodge</b><span>📚 💸 🔋 💬 ⏰</span><small>Life problems add stress and cost coins. Big ones like 💸 and 🏥 cost the most.</small></div>
+<div class="leg bad"><b>Dodge</b><span>📚 💸 🔋 💬 ⏰</span><small>Life problems add stress and cost $COOKED. Big ones like 💸 and 🏥 cost the most.</small></div>
 <div class="leg good"><b>Catch</b><span>☕ 😴 🧊 🎧 🍕 🫂</span><small>Cool you down. Chain 4 for a bonus.</small></div>
 <div class="leg pw"><b>Power-ups</b><span>🛡️ ⏳</span><small>Block a hit, or slow time</small></div>
-<p class="how">Drag left and right, or use the arrow keys. You earn coins every second, and every problem that hits you takes coins off your balance. Your level follows the coins in your balance, so spending or losing coins can lower it, and every level needs more than the last.</p><button id="wi">▶ Watch intro</button><button class="alt" id="bk">Back</button>`;$('bk').onclick=menu;$('wi').onclick=intro}
+<p class="how">Drag left and right, or use the arrow keys. You earn $COOKED every second, and every problem that hits you takes $COOKED off your balance. Your level follows the $COOKED in your balance, so spending or losing $COOKED can lower it, and every level needs more than the last.</p><button id="wi">▶ Watch intro</button><button class="alt" id="bk">Back</button>`;$('bk').onclick=menu;$('wi').onclick=intro}
 function airdrop(){const hasSol=!!ld('cooked_sol','');
 $('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision for the next 6 months: take Cooked from a browser game to a live token on Solana, with the players who got us there first in line.</p>
 <h3 class="ah">The 6-month plan</h3>
@@ -637,14 +637,14 @@ $('card').innerHTML=`<h2>🪂 $COOKED Airdrop</h2><p class="small">Our vision fo
 <h3 class="ah">Criteria before launch</h3>
 <ul class="al ck"><li>1,000,000 players reached</li><li>250,000 Solana wallet addresses submitted</li><li>Daily active community and growing social channels</li><li>Smart contracts audited and verified</li><li>Legal opinion on the token completed</li><li>Liquidity seeded and locked</li><li>Anti-bot and fair-play checks live</li></ul>
 <h3 class="ah">How to qualify for the airdrop</h3>
-<ul class="al"><li>Play regularly and build up your cooked coins.</li><li>Complete daily challenges and climb the levels.</li><li>Submit your Solana address in the wallet.</li><li>Play fair. Bots and multiple accounts are removed.</li><li>Invite friends and share your results.</li></ul>
+<ul class="al"><li>Play regularly and build up your $COOKED.</li><li>Complete daily challenges and climb the levels.</li><li>Submit your Solana address in the wallet.</li><li>Play fair. Bots and multiple accounts are removed.</li><li>Invite friends and share your results.</li></ul>
 <p class="small">Airdrop allocations come from the community campaigns share of the supply and are based on verified play. Goals and dates can change as we build, and we will announce updates in the game.</p>
 <button class="play" id="adw">${hasSol?'Update my Solana address':'Submit my Solana address'}</button><button class="alt" id="bk">Back</button>`;
 $('bk').onclick=menu;$('adw').onclick=()=>wallet(airdrop)}
-function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(bal)+1}: ${LVL(lvlOf(bal)).name} · ${fmt(bal)} / ${fmt(thr(lvlOf(bal)+1))} coins for Level ${lvlOf(bal)+2}</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your coins.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of coins? Play a run or watch an ad in the shop to earn more.</p>':''}`;
+function menu(){$('card').innerHTML=`<h1>Cooked</h1><p class="tag">Survive real life.</p><div class="chip"><i class=cc></i> ${fmt(bal)}</div><p class="small">Level ${lvlOf(bal)+1}: ${LVL(lvlOf(bal)).name} · ${fmt(bal)} / ${fmt(thr(lvlOf(bal)+1))} $COOKED for Level ${lvlOf(bal)+2}</p>${canSave?'':'<p class="small" style="color:#ffb347">Saving is blocked in this view. Open the game link in your own browser to keep your $COOKED.</p>'}${best?`<p class="small">Best run: ${best.toFixed(1)}s · Best level ${ld('cooked_bl',0)+1}</p>`:''}${spon()}<button class="play" id="go">▶ Play</button><div class="grid"><button class="alt" id="mc">🎯 Challenges</button><button class="alt" id="ms">🛒 Shop</button><button class="alt" id="mw"><i class=cc></i> Wallet</button><button class="alt" id="ma">🪂 Airdrop</button><button class="alt" id="mp">📄 Whitepaper</button><button class="alt" id="mtk">💎 $COOKED token</button><button class="alt" id="mh">❓ How to play</button><button class="alt" id="mm">${mute?'🔇 Sound off':'🔊 Sound on'}</button></div>${bal<=0?'<p class="small">Out of $COOKED? Play a run or watch an ad in the shop to earn more.</p>':''}`;
 $('go').onclick=startGame;$('mc').onclick=challenges;$('ma').onclick=airdrop;$('mw').onclick=()=>wallet(menu);$('mh').onclick=howto;$('ms').onclick=()=>shop(menu);$('mm').onclick=toggleMute;$('mp').onclick=()=>openWP();$('mtk').onclick=()=>openWP('tokenomics')}
 
-const CAP=[[0,'COOKED','Survive real life.',1],[1.6,'This is you','A calm little orb. Keep your stress low.'],[3.4,'Life throws problems at you','Exams, low battery, no reply. Dodge them.'],[6.4,'Get hit and it costs you','Stress goes up and coins drop. Big problems cost more.'],[9.2,'Small joys cool you down','Coffee, rest, music. Catch them to calm down.'],[12.2,'Level up through real life','Student, job, family and beyond. It never ends.'],[14.8,'How long can you stay cool?','Drag left and right to move.']];
+const CAP=[[0,'COOKED','Survive real life.',1],[1.6,'This is you','A calm little orb. Keep your stress low.'],[3.4,'Life throws problems at you','Exams, low battery, no reply. Dodge them.'],[6.4,'Get hit and it costs you','Stress goes up and you lose $COOKED. Big problems cost more.'],[9.2,'Small joys cool you down','Coffee, rest, music. Catch them to calm down.'],[12.2,'Level up through real life','Student, job, family and beyond. It never ends.'],[14.8,'How long can you stay cool?','Drag left and right to move.']];
 const EV=[[3.4,'📚','Exam tomorrow','d'],[4.1,'🔋','Phone at 1%','d'],[4.8,'💬','Seen, no reply','d'],[6.2,'💸','Rent due','h',5],[6.9,'🧾','Surprise bill','h',4],[9,'☕','Coffee break','c'],[9.7,'😴','Nap','c'],[10.4,'🎧','Favorite song','c']];
 let iT=0,iE=0,iC=-1;const pxF=x=>.55*Math.sin(x*1.3),TR=1.62;
 function setCap(a,b,big){const c=$('cap');$('ct').textContent=a;$('cs').textContent=b;c.classList.remove('in','big');void c.offsetWidth;c.classList.add('in');if(big)c.classList.add('big')}
@@ -700,13 +700,13 @@ function adLabel(){const w=adWait();if(w<0)return'📺 Daily limit reached<br><s
 let adTick=null;
 function shop(back=menu){const free=adWait()===0,m=shopMsg,j=shopJust;clearInterval(adTick);shopMsg=null;shopJust=null;
 const jc=id=>j===id?' just':'';
-$('card').innerHTML=`<h2>🛒 Shop</h2><div class="chip"><i class=cc></i> ${fmt(bal)}</div><div id="shn" aria-live="polite">${m?`<div class="shmsg ${m.t||''}"><b>${m.h}</b>${m.b||''}${m.s?'<small>'+m.s+'</small>':''}</div>`:''}</div><h4 class="sh">Free coins</h4><button class="alt adb${jc('fa')}" id="fa" ${free?'':'disabled'}>${adLabel()}</button><h4 class="sh">Orb looks</h4><div class="grid g3">${SK.map((k,i)=>`<button class="alt${jc('sk'+i)}" id="sk${i}">${inv.owned.includes(k.n)?(inv.skin===k.n?'<b>✓ '+k.n+'</b><span class="d">Equipped</span>':'<b>'+k.n+'</b><span class="d">Tap to equip</span>'):'<b>'+k.n+'</b><small>'+fmt(k.cost)+' <i class=cc></i></small>'}<span class="d mx">x${k.m} coins</span></button>`).join('')}</div><h4 class="sh">Boosts for your next run</h4><div class="grid bst"><button class="alt${jc('bs')}" id="bs"><span class="bt">🛡️ Start shield</span><span class="pr">250 <i class=cc></i></span><span class="d">Blocks the first problem that hits you</span><span class="ow">You have ${inv.shield}</span></button><button class="alt${jc('bi')}" id="bi"><span class="bt">🧾 Insurance</span><span class="pr">400 <i class=cc></i></span><span class="d">Halves coins lost from hits for one run</span><span class="ow">You have ${inv.ins}</span></button></div><button class="alt" style="width:100%;margin-top:16px" id="bk">Back</button>`;
-const say_=(o,id)=>{shopMsg=o;shopJust=id||null;shop(back)},buy=(c,id,f,o)=>{if(bal<c){say_({t:'bad',h:'Not enough coins',b:'You need '+fmt(c-bal)+' more. Play a run or watch an ad to earn them.'},null);return}bal-=c;sv('cooked_bal',bal);f();sinv();say_(o(),id)};
+$('card').innerHTML=`<h2>🛒 Shop</h2><div class="chip"><i class=cc></i> ${fmt(bal)}</div><div id="shn" aria-live="polite">${m?`<div class="shmsg ${m.t||''}"><b>${m.h}</b>${m.b||''}${m.s?'<small>'+m.s+'</small>':''}</div>`:''}</div><h4 class="sh">Free $COOKED</h4><button class="alt adb${jc('fa')}" id="fa" ${free?'':'disabled'}>${adLabel()}</button><h4 class="sh">Orb looks</h4><div class="grid g3">${SK.map((k,i)=>`<button class="alt${jc('sk'+i)}" id="sk${i}">${inv.owned.includes(k.n)?(inv.skin===k.n?'<b>✓ '+k.n+'</b><span class="d">Equipped</span>':'<b>'+k.n+'</b><span class="d">Tap to equip</span>'):'<b>'+k.n+'</b><small>'+fmt(k.cost)+' <i class=cc></i></small>'}<span class="d mx">x${k.m} $COOKED</span></button>`).join('')}</div><h4 class="sh">Boosts for your next run</h4><div class="grid bst"><button class="alt${jc('bs')}" id="bs"><span class="bt">🛡️ Start shield</span><span class="pr">250 <i class=cc></i></span><span class="d">Blocks the first problem that hits you</span><span class="ow">You have ${inv.shield}</span></button><button class="alt${jc('bi')}" id="bi"><span class="bt">🧾 Insurance</span><span class="pr">400 <i class=cc></i></span><span class="d">Halves $COOKED lost from hits for one run</span><span class="ow">You have ${inv.ins}</span></button></div><button class="alt" style="width:100%;margin-top:16px" id="bk">Back</button>`;
+const say_=(o,id)=>{shopMsg=o;shopJust=id||null;shop(back)},buy=(c,id,f,o)=>{if(bal<c){say_({t:'bad',h:'Not enough $COOKED',b:'You need '+fmt(c-bal)+' more. Play a run or watch an ad to earn them.'},null);return}bal-=c;sv('cooked_bal',bal);f();sinv();say_(o(),id)};
 adTick=setInterval(()=>{const b=$('fa');if(!b){clearInterval(adTick);return}const w=adWait();b.innerHTML=adLabel();b.disabled=w!==0},1000);
-$('fa').onclick=()=>{if(adWait()!==0)return;runAd('free',()=>{if(adWait()!==0)return;bal+=CFG.rewards.free;sv('cooked_bal',bal);inv.adAt=Date.now();inv.adN=(inv.adN||0)+1;sinv();say_({t:'ok',h:'+'+fmt(CFG.rewards.free)+' coins added',b:'Thanks for watching! Your balance is now '+fmt(bal)+'.'},'fa')})};
-SK.forEach((k,i)=>$('sk'+i).onclick=()=>{if(inv.owned.includes(k.n)){inv.skin=k.n;sinv();say_({t:'ok',h:k.n+' equipped',b:'Your orb will look like this in your next run.'},'sk'+i)}else buy(k.cost,'sk'+i,()=>{inv.owned.push(k.n);inv.skin=k.n},()=>({h:'✅ Purchased: '+k.n+' orb',b:'It is yours forever and already equipped. Spent '+fmt(k.cost)+' coins.',s:'Tap any look you own to switch.'}))});
-$('bs').onclick=()=>buy(250,'bs',()=>inv.shield++,()=>({h:'✅ Purchased: Start shield',b:'🛡️ Your next run begins with a shield that blocks the first problem that hits you, so no coins lost. One shield is used up per run.',s:'You now have '+inv.shield+' · Spent 250 coins'}));
-$('bi').onclick=()=>buy(400,'bi',()=>inv.ins++,()=>({h:'✅ Purchased: Insurance',b:'🧾 During your next run, every hit takes only half the usual coins off your balance. One insurance is used up per run.',s:'You now have '+inv.ins+' · Spent 400 coins'}));
+$('fa').onclick=()=>{if(adWait()!==0)return;runAd('free',()=>{if(adWait()!==0)return;bal+=CFG.rewards.free;sv('cooked_bal',bal);inv.adAt=Date.now();inv.adN=(inv.adN||0)+1;sinv();say_({t:'ok',h:'+'+fmt(CFG.rewards.free)+' $COOKED added',b:'Thanks for watching! Your balance is now '+fmt(bal)+'.'},'fa')})};
+SK.forEach((k,i)=>$('sk'+i).onclick=()=>{if(inv.owned.includes(k.n)){inv.skin=k.n;sinv();say_({t:'ok',h:k.n+' equipped',b:'Your orb will look like this in your next run.'},'sk'+i)}else buy(k.cost,'sk'+i,()=>{inv.owned.push(k.n);inv.skin=k.n},()=>({h:'✅ Purchased: '+k.n+' orb',b:'It is yours forever and already equipped. Spent '+fmt(k.cost)+' $COOKED.',s:'Tap any look you own to switch.'}))});
+$('bs').onclick=()=>buy(250,'bs',()=>inv.shield++,()=>({h:'✅ Purchased: Start shield',b:'🛡️ Your next run begins with a shield that blocks the first problem that hits you, so no $COOKED lost. One shield is used up per run.',s:'You now have '+inv.shield+' · Spent 250 $COOKED'}));
+$('bi').onclick=()=>buy(400,'bi',()=>inv.ins++,()=>({h:'✅ Purchased: Insurance',b:'🧾 During your next run, every hit takes only half the usual $COOKED off your balance. One insurance is used up per run.',s:'You now have '+inv.ins+' · Spent 400 $COOKED'}));
 $('bk').onclick=back}
 function offerRevive(){S='revive';stat.rev=1;sfx('over');$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
 $('card').innerHTML=`<h2>😵 You're cooked!</h2><p>Stress hit 100%. Take one second chance this run.</p><button class="play" id="rv1" ${bal>=CFG.reviveCost?'':'disabled'}><i class=cc></i> Revive · ${fmt(CFG.reviveCost)}</button><button class="alt" id="rv2" style="width:100%">📺 Watch an ad to revive</button><button class="alt" id="rv3" style="width:100%">No thanks</button>`;
@@ -732,9 +732,9 @@ function cardBlob(r){return new Promise(res=>{const c=document.createElement('ca
 const T=(t,y,f,col)=>{x.font=f;x.fillStyle=col;x.fillText(t,540,y)};
 T('COOKED',170,'bold 120px sans-serif','#fff');T('Survive real life',245,'60px sans-serif','#d8c8ee');T(V.icon,560,'260px '+EF,'#fff');T(V.title,700,'bold 76px sans-serif','#ffd75e');
 T('Level '+(r.L+1)+': '+V.name,790,'52px sans-serif','#fff');T(r.sc.toFixed(1)+'s',960,'bold 130px sans-serif','#fff');
-T((r.net>=0?'+':'')+fmt(r.net)+' Cooked Coins',1050,'56px sans-serif',r.net>=0?'#8fffa8':'#ff9f8f');T('Lost '+fmt(r.loss)+' to life problems',1120,'44px sans-serif','#d8c8ee');T('Can you beat this?',1260,'bold 52px sans-serif','#ff9f43');
+T((r.net>=0?'+':'')+fmt(r.net)+' $COOKED',1050,'56px sans-serif',r.net>=0?'#8fffa8':'#ff9f8f');T('Lost '+fmt(r.loss)+' to life problems',1120,'44px sans-serif','#d8c8ee');T('Can you beat this?',1260,'bold 52px sans-serif','#ff9f43');
 c.toBlob(b=>res(b),'image/png')})}
-function shareText(r){const V=LVL(r.L);return '🔥 I got COOKED!\n'+V.icon+' Level '+(r.L+1)+': '+V.title+'\n⏱️ '+r.sc.toFixed(1)+'s  ·  💰 '+fmt(bal)+' Cooked Coins\n\nThink you can beat me? 👇\n'+(CFG.site||location.href)}
+function shareText(r){const V=LVL(r.L);return '🔥 I got COOKED!\n'+V.icon+' Level '+(r.L+1)+': '+V.title+'\n⏱️ '+r.sc.toFixed(1)+'s  ·  💰 '+fmt(bal)+' $COOKED\n\nThink you can beat me? 👇\n'+(CFG.site||location.href)}
 async function shareCard(r){const text=shareText(r);let b=null;try{b=await(r._p||cardBlob(r))}catch(e){}
 const f=b?new File([b],'cooked.png',{type:'image/png'}):null;
 try{if(f&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text});return}if(navigator.share){await navigator.share({text});return}}
@@ -798,9 +798,9 @@ function draw(){
  const drawIt=it=>{const p=proj(it.wx,it.d),sz=Math.max(18,64*p.s*(W<500?.9:1.1));
   g.globalAlpha=it.d<0?Math.max(0,1+it.d/.3):Math.min(1,(1-it.d)*5);
   g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(p.x,p.y+sz*.45,sz*.45,sz*.14,0,0,6.3);g.fill();
-  const gl=it.v===1?'#ff3d2e':it.v===2?'#7fe3ff':'#ffe27a';g.shadowColor=gl;g.shadowBlur=6*p.s;
-  g.font=sz+'px serif';g.textAlign='center';g.textBaseline='middle';
-  g.save();g.translate(p.x,p.y-sz*.1);g.rotate(Math.sin(it.rot)*.22);g.fillText(it.e,0,0);g.restore();g.shadowBlur=0;
+  const gl=it.v===1?'#ff3d2e':it.v===2?'#7fe3ff':'#ffe27a';
+  g.shadowBlur=0;{const sp=emoSprite(it.e,gl,sz),k=sz/sp.q,w=sp.w*k;
+  g.save();g.translate(p.x,p.y-sz*.1);g.rotate(Math.sin(it.rot)*.22);g.drawImage(sp.c,-w/2,-w/2,w,w);g.restore()}
   if(it.lab&&p.s>.3){g.font='700 '+Math.max(10,13*p.s*1.2)+'px sans-serif';g.fillStyle=it.v===1?'#ffb3a8':'#b8f0ff';g.fillText(it.lab,p.x,p.y-sz*.72)}g.globalAlpha=1};
  items.filter(i=>i.d>=0).sort((a,b)=>b.d-a.d).forEach(drawIt);
  // orb
@@ -821,7 +821,7 @@ function draw(){
  if(slow>0){g.strokeStyle='rgba(255,226,122,.3)';g.lineWidth=4;g.strokeRect(3,3,W-6,H-6)}
  g.restore();
 }
-function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
+function loop(n){requestAnimationFrame(loop);if(S==='play'||S==='intro'||S==='cd'){qAcc+=Math.min(100,n-last);if(++qN>=90){if(qAcc/qN>26&&DPRMAX>1){DPRMAX=Math.max(1,DPRMAX-.25);rs()}qAcc=0;qN=0}}else{qAcc=0;qN=0}const dt=Math.min(.05,Math.max(0,(n-last)/1000));last=n;
 try{if(S==='play'){if(!isFinite(heat))heat=50;upd(dt)}else if(S==='intro')introStep(dt);else if(S==='paused'||S==='revive'){}else if(S==='cd')cdStep(dt);else{scroll+=dt*.3;px+=(0-px)*.1}draw()}catch(e){console.error(e);try{g.restore()}catch(_){}}}
 requestAnimationFrame(n=>{last=n;loop(n)});
 
@@ -835,11 +835,12 @@ function goSplash(fb){if(!spl||splGo)return;splGo=true;const el=$('splash');el.c
 function loadThree(){let done=false;const fb=()=>{if(done)return;done=true;goSplash(true)},tm=setTimeout(fb,2500);
 const ok=()=>{if(done)return;clearTimeout(tm);done=true;try{start3D()}catch(e){console.error(e);splGo=false;clearTimeout(spT);goSplash(true)}};
 try{if(window.THREE)ok();else{const x=document.createElement('script');x.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';x.onload=ok;x.onerror=fb;document.head.appendChild(x)}}catch(e){fb()}}
+const EMO={};function emoSprite(e,col,sz){const q=Math.max(16,Math.round(sz/8)*8),key=e+col+q+'@'+DPR;let s=EMO[key];if(!s){const pad=Math.ceil(q*.4),w=q+pad*2,c=document.createElement('canvas');c.width=c.height=Math.ceil(w*DPR);const x=c.getContext('2d');x.scale(DPR,DPR);x.shadowColor=col;x.shadowBlur=Math.max(3,q*.1);x.font=q+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,w/2,w/2);s=EMO[key]={c:c,w:w,q:q}}return s}
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function wrapT(g,txt,x,y,w,lh){let l='';for(const wd of txt.split(' ')){const tt=l?l+' '+wd:wd;if(g.measureText(tt).width>w&&l){g.fillText(l,x,y);l=wd;y+=lh}else l=tt}g.fillText(l,x,y)}
 const EF='"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
 function start3D(){
-const T=THREE,r=new T.WebGLRenderer({canvas:$('sp3d'),antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+const T=THREE,r=new T.WebGLRenderer({canvas:$('sp3d'),antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
 const sc=new T.Scene(),cam=new T.PerspectiveCamera(62,1,.1,220);sc.add(cam);
 const C0=new T.Color(0x1a0a2e),C1=new T.Color(0x5a1008),RED=new T.Color(0xff3b2a),cc=new T.Color(),O0=new T.Color(0xcfb8ff),O1=new T.Color(0xff6a4a);
 sc.fog=new T.FogExp2(0x1a0a2e,.04);
@@ -892,7 +893,7 @@ $('splash').classList.add('d3');goSplash(false);raf=requestAnimationFrame(frame)
 function bankRun(){const r=Math.floor(runC);runC=0;if(!r)return;bal=Math.max(0,bal+r);sv('cooked_bal',bal);tot+=Math.max(0,r);sv('cooked_tot',tot)}
 function pauseGame(){if(S!=='play')return;S='paused';for(const k in keys)keys[k]=0;$('pause').classList.add('hide');$('ov').style.background='rgba(5,2,12,.6)';$('ov').classList.remove('hide');
 const IP='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>',IR='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',IM='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
-$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Game paused</p><h2 style="margin:4px 0 2px">Level ${lvl+1}</h2><p class="small" style="margin:0 0 10px">${LVL(lvl).name}</p><div class="ostats"><div><b>${t.toFixed(1)}s</b><span>Time</span></div><div><b>${Math.round(heat)}%</b><span>Stress</span></div><div><b>${fmt(runC)}</b><span>Coins</span></div></div><button class="play ib" id="rs">${IP}Resume</button><div class="grid"><button class="alt ib" id="rr">${IR}Restart</button><button class="alt ib" id="rq">${IM}Menu</button></div><p class="small">Restarting or leaving keeps the coins you have earned so far.</p>`;
+$('card').innerHTML=`<p class="small" style="letter-spacing:2px;text-transform:uppercase;margin:0">Game paused</p><h2 style="margin:4px 0 2px">Level ${lvl+1}</h2><p class="small" style="margin:0 0 10px">${LVL(lvl).name}</p><div class="ostats"><div><b>${t.toFixed(1)}s</b><span>Time</span></div><div><b>${Math.round(heat)}%</b><span>Stress</span></div><div><b>${fmt(runC)}</b><span>$COOKED</span></div></div><button class="play ib" id="rs">${IP}Resume</button><div class="grid"><button class="alt ib" id="rr">${IR}Restart</button><button class="alt ib" id="rq">${IM}Menu</button></div><p class="small">Restarting or leaving keeps the $COOKED you have earned so far.</p>`;
 $('rs').onclick=resume;$('rr').onclick=()=>{bankRun();$('ov').style.background='';beginRun()};$('rq').onclick=()=>{bankRun();$('ov').style.background='';S='menu';$('hud').classList.add('hide');menu()}}
 let cdT=0,cdN=0;
 function resume(){if(S!=='paused')return;$('ov').style.background='';$('ov').classList.add('hide');$('pause').classList.remove('hide');S='cd';cdT=3;cdN=0}
