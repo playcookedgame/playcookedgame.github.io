@@ -1,7 +1,7 @@
 /* Cooked service worker: network-first so new deploys show immediately,
    cache fallback so the game still opens offline. Only same-origin GETs are touched
    (Supabase, ads and other sites always go straight to the network). */
-const CACHE = 'cooked-v1';
+const CACHE = 'cooked-v2';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -18,6 +18,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request, url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== location.origin) return;
+  if (req.headers.has('range')) return; // let audio/video range requests go straight to the network
   if (url.pathname.endsWith('/admin.html')) return; // never cache the admin page
   e.respondWith(
     fetch(req).then(res => {
